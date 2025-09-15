@@ -1,0 +1,27 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.pyc
+
+# Entorno virtual
+venv/
+.env
+.env.*
+
+# SQLite
+*.db
+*.sqlite3
+
+# Archivos temporales
+*.log
+*.tmp
+*.swp
+.DS_Store
+
+# VSCode
+.vscode/
+
+# Archivos de sistema
+Thumbs.db

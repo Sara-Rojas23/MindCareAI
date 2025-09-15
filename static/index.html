@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MindCare AI - Diario Emocional</title>
+    <link rel="stylesheet" href="/static/css/styles.css">
+</head>
+<body>
+    <div id="app">
+        <h1>MindCare AI</h1>
+        <p>Diario emocional inteligente</p>
+        <nav>
+            <button id="nav-registro" class="nav-btn">Registrar emoción</button>
+            <button id="nav-historial" class="nav-btn">Historial</button>
+        </nav>
+        <section id="registro-section">
+            <form id="analyze-form">
+                <label for="emotion-text">¿Cómo te sientes hoy?</label>
+                <textarea id="emotion-text" name="emotion-text" rows="4" maxlength="300" placeholder="Escribe aquí tus emociones..." required></textarea>
+                <div class="form-footer">
+                    <span id="char-count">0/300</span>
+                    <button type="submit" id="analyze-btn">Analizar emoción</button>
+                </div>
+            </form>
+            <div id="result-card" class="hidden">
+                <h2>Resultado</h2>
+                <p><strong>Emoción detectada:</strong> <span id="result-emotion"></span></p>
+                <p><strong>Confianza:</strong> <span id="result-confidence"></span></p>
+                <p><strong>Método:</strong> <span id="result-method"></span></p>
+            </div>
+        </section>
+        <section id="historial-section" class="hidden">
+            <h2>Historial de emociones</h2>
+            <table id="historial-table">
+                <thead>
+                    <tr>
+                        <th>Fecha</th>
+                        <th>Emoción</th>
+                        <th>Confianza</th>
+                        <th>Texto</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Aquí se insertarán las filas del historial -->
+                </tbody>
+            </table>
+        </section>
+    </div>
+    <script type="module" src="/static/js/app.js"></script>
+</body>
+</html>

@@ -1,0 +1,7 @@
+fastapi>=0.104
+uvicorn[standard]
+pydantic>=2.0
+transformers>=4.35
+torch
+sqlalchemy
+python-dotenv
