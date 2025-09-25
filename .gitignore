@@ -64,3 +64,6 @@ logs/
 
 # Archivos de sistema
 Thumbs.db
+models/
+*.bin
+*.safetensors
