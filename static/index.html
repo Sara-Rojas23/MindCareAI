@@ -5,16 +5,47 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MindCare AI - Diario Emocional</title>
     <link rel="stylesheet" href="/static/css/styles.css">
+    <link rel="icon" type="image/svg+xml" href="/static/favicon.svg">
 </head>
 <body>
     <div id="app">
         <h1>MindCare AI</h1>
         <p>Diario emocional inteligente</p>
         <nav>
+            <button id="nav-login" class="nav-btn">Iniciar sesión</button>
+            <button id="nav-register" class="nav-btn">Registrarse</button>
             <button id="nav-registro" class="nav-btn">Registrar emoción</button>
             <button id="nav-historial" class="nav-btn">Historial</button>
+            <span id="user-info" class="user-info hidden"></span>
+            <button id="logout-btn" class="nav-btn hidden">Cerrar sesión</button>
+            <button id="copy-token-btn" class="nav-btn hidden">Copiar token JWT</button>
         </nav>
-        <section id="registro-section">
+        <section id="login-section" class="hidden">
+            <h2>Iniciar sesión</h2>
+            <form id="login-form">
+                <label for="login-email">Correo electrónico</label>
+                <input type="email" id="login-email" name="login-email" required autocomplete="username">
+                <label for="login-password">Contraseña</label>
+                <input type="password" id="login-password" name="login-password" required autocomplete="current-password">
+                <button type="submit">Entrar</button>
+            </form>
+            <div id="login-error" class="form-error"></div>
+        </section>
+
+        <section id="register-section" class="hidden">
+            <h2>Registrarse</h2>
+            <form id="register-form">
+                <label for="register-name">Nombre</label>
+                <input type="text" id="register-name" name="register-name" required>
+                <label for="register-email">Correo electrónico</label>
+                <input type="email" id="register-email" name="register-email" required autocomplete="username">
+                <label for="register-password">Contraseña</label>
+                <input type="password" id="register-password" name="register-password" required autocomplete="new-password">
+                <button type="submit">Crear cuenta</button>
+            </form>
+            <div id="register-error" class="form-error"></div>
+        </section>
+    <section id="registro-section" class="hidden">
             <form id="analyze-form">
                 <label for="emotion-text">¿Cómo te sientes hoy?</label>
                 <textarea id="emotion-text" name="emotion-text" rows="4" maxlength="300" placeholder="Escribe aquí tus emociones..." required></textarea>
@@ -28,6 +59,7 @@
                 <p><strong>Emoción detectada:</strong> <span id="result-emotion"></span></p>
                 <p><strong>Confianza:</strong> <span id="result-confidence"></span></p>
                 <p><strong>Método:</strong> <span id="result-method"></span></p>
+                <div id="result-message" class="result-message"></div>
             </div>
         </section>
         <section id="historial-section" class="hidden">

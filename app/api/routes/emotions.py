@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Depends, Body, Query
-from app.api.dependencies import get_current_user
+from app.api.auth_utils import get_current_user
 from pydantic import BaseModel
 from app.services.emotion_analyzer import EmotionAnalyzer
 from app.database.connection import SessionLocal
@@ -40,10 +40,14 @@ class HistoryEntry(BaseModel):
     date: str
 
 @router.post("/analyze", response_model=AnalyzeResponse)
-def analyze_emotion(payload: AnalyzeRequest = Body(...), db: Session = Depends(get_db)):
+def analyze_emotion(
+    payload: AnalyzeRequest = Body(...),
+    db: Session = Depends(get_db),
+    current_user=Depends(get_current_user)
+):
     result = analyzer.analyze(payload.text)
     entry = EmotionEntryDB(
-        user_id=payload.user_id,
+        user_id=current_user.id,
         text=payload.text,
         detected_emotion=result["emotion"],
         confidence=result["confidence"],
@@ -65,12 +69,12 @@ def analyze_emotion(payload: AnalyzeRequest = Body(...), db: Session = Depends(g
 
 @router.get("/history", response_model=List[HistoryEntry])
 def get_history(
-    user_id: int = Query(1),
     limit: int = Query(50, ge=1, le=100),
     offset: int = Query(0, ge=0),
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    current_user=Depends(get_current_user)
 ):
-    entries = db.query(EmotionEntryDB).filter(EmotionEntryDB.user_id == user_id)
+    entries = db.query(EmotionEntryDB).filter(EmotionEntryDB.user_id == current_user.id)
     entries = entries.order_by(EmotionEntryDB.created_at.desc()).offset(offset).limit(limit).all()
     return [
         HistoryEntry(

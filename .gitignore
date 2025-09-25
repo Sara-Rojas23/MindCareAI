@@ -14,6 +14,45 @@ venv/
 *.db
 *.sqlite3
 
+# Modelos de IA y cachés
+models/
+models--*/
+*.bin
+*.safetensors
+*.pt
+*.h5
+*.ckpt
+*.onnx
+*.pb
+*.tflite
+*.joblib
+*.pkl
+*.npz
+*.npy
+
+# Datos y muestras
+data/
+*.csv
+*.jsonl
+*.parquet
+*.feather
+*.xls*
+
+# Archivos temporales de Jupyter y VSCode
+.ipynb_checkpoints/
+.pytest_cache/
+.mypy_cache/
+.cache/
+.coverage
+htmlcov/
+dist/
+build/
+__pypackages__/
+
+# Archivos de logs grandes
+*.log
+logs/
+
 # Archivos temporales
 *.log
 *.tmp

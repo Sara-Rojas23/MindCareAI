@@ -12,7 +12,7 @@ class EmotionAnalyzer:
             self.nlp: Pipeline = pipeline(
                 "text-classification",
                 model=settings.MODEL_NAME,
-                return_all_scores=True,
+                top_k=None,  # Reemplaza return_all_scores=True
                 device=0 if settings.USE_GPU and torch.cuda.is_available() else -1,
                 model_kwargs={"cache_dir": settings.MODEL_CACHE_DIR}
             )
@@ -25,8 +25,8 @@ class EmotionAnalyzer:
         processed_text = self._preprocess(text)
         if self.model_loaded:
             try:
+                # El modelo devuelve una lista de dicts [{'label': 'anger', 'score': 0.8}, ...]
                 scores = self.nlp(processed_text)[0]
-                # scores: list of dicts [{'label': 'joy', 'score': 0.8}, ...]
                 scores_sorted = sorted(scores, key=lambda x: x['score'], reverse=True)
                 top = scores_sorted[0]
                 emotion_en = top['label'].lower()

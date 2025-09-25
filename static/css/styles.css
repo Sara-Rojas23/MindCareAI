@@ -1,3 +1,29 @@
+/* Mensaje de error para formularios */
+.form-error {
+    color: #b3261e;
+    background: #ffeaea;
+    border: 1px solid #f5c2c7;
+    border-radius: 6px;
+    padding: 0.5em 1em;
+    margin-top: 0.5em;
+    margin-bottom: 0.5em;
+    font-size: 1em;
+    display: block !important;
+    min-height: 1.5em;
+    transition: opacity 0.2s;
+    opacity: 1;
+}
+/* Estilo para el mensaje de resultado y recomendación */
+.result-message {
+    margin-top: 1rem;
+    padding: 1rem;
+    background: #f0f7fa;
+    border-left: 4px solid #3bb3c3;
+    border-radius: 8px;
+    font-size: 1.05em;
+    color: #234;
+    transition: background 0.3s;
+}
 body {
     font-family: 'Segoe UI', Arial, sans-serif;
     margin: 0;

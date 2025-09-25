@@ -10,7 +10,7 @@ class Settings(BaseSettings):
     DATABASE_URL: str = "sqlite:///./data/mindcare.db"
     
     # AI Model
-    MODEL_NAME: str = "cardiffnlp/twitter-roberta-base-emotion"
+    MODEL_NAME: str = "pysentimiento/robertuito-emotion-analysis"
     USE_GPU: bool = False
     MODEL_CACHE_DIR: str = "./models"
     
