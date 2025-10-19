@@ -2,9 +2,9 @@ import time
 import subprocess
 from datetime import datetime
 
-# Intervalo de respaldo en segundos (ejemplo: 3600 = 1 hora)
-# 30 días = 30 * 24 * 60 * 60 = 2,592,000 segundos
-BACKUP_INTERVAL = 2592000  # 1 mes
+# Intervalo de respaldo en segundos
+# 6 meses = 180 días = 180 * 24 * 60 * 60 = 15,552,000 segundos
+BACKUP_INTERVAL = 15552000  # 6 meses
 
 print("Iniciando backup automático de la base de datos...")
 

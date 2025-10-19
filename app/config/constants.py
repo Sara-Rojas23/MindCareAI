@@ -1,7 +1,7 @@
 
 # Mapeo de emociones (en español) para pysentimiento/robertuito-emotion-analysis
 EMOTION_MAPPING = {
-    'joy': 'alegría',
+    'joy': 'alegria',
     'sadness': 'tristeza',
     'anger': 'enojo',
     'fear': 'miedo',

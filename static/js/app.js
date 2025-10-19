@@ -1,13 +1,27 @@
 // --- Mensajes y recomendaciones por emoción ---
+console.log('=====================================');
+console.log('¡ARCHIVO JS CARGADO CORRECTAMENTE!');
+console.log('=====================================');
+
 const EMOTION_MESSAGES = {
-  alegria: {
-    mensaje: '¡Qué bueno que te sientas alegre! Disfruta este momento y compártelo con quienes te rodean.',
+  'alegria': {
+    mensaje: '¡Qué alegría verte tan bien! Tu energía positiva puede inspirar a quienes te rodean.',
     recomendaciones: [
-      'Haz una lista de cosas que te hacen feliz y repítelas cuando lo necesites.',
-      'Comparte tu alegría con alguien cercano.',
-      'Agradece por lo bueno que tienes hoy.',
-      'Escucha tu música favorita y baila.',
-      'Haz una actividad creativa que te motive.'
+      'Comparte este buen momento con alguien importante para ti; la alegría compartida se multiplica.',
+      'Anota qué te hizo sentir feliz; te ayudará a reconocer qué cosas te aportan bienestar.',
+      'Mantén el impulso haciendo algo que disfrutes, aunque sea un detalle pequeño.',
+      'Tómate un momento para agradecer lo que te hace sentir así; la gratitud fortalece el bienestar emocional.',
+      'Guarda esta sensación como referencia para cuando los días sean más difíciles.'
+    ]
+  },
+  'joy': {
+    mensaje: '¡Qué alegría verte tan bien! Tu energía positiva puede inspirar a quienes te rodean.',
+    recomendaciones: [
+      'Comparte este buen momento con alguien importante para ti; la alegría compartida se multiplica.',
+      'Anota qué te hizo sentir feliz; te ayudará a reconocer qué cosas te aportan bienestar.',
+      'Mantén el impulso haciendo algo que disfrutes, aunque sea un detalle pequeño.',
+      'Tómate un momento para agradecer lo que te hace sentir así; la gratitud fortalece el bienestar emocional.',
+      'Guarda esta sensación como referencia para cuando los días sean más difíciles.'
     ]
   },
   tristeza: {
@@ -114,6 +128,9 @@ async function fetchHistorial() {
 
 // --- Lógica principal UI ---
 document.addEventListener('DOMContentLoaded', () => {
+  // Alerta de prueba
+  alert('¡El archivo JavaScript se ha cargado!');
+  
   // Elementos globales
   // Elementos globales (robustecidos)
   const loginForm = document.getElementById('login-form');
@@ -223,24 +240,83 @@ document.addEventListener('DOMContentLoaded', () => {
       const text = textarea.value.trim();
       if (!text) return;
       const res = await analyzeEmotion(text);
-      const emocion = res.emotion.charAt(0).toUpperCase() + res.emotion.slice(1);
-      resultEmotion.textContent = emocion;
-      // Mostrar mensaje y recomendación aleatoria
-      const info = EMOTION_MESSAGES[res.emotion] || EMOTION_MESSAGES[res.emotion?.toLowerCase()] || {};
+      
+      // Obtener la emoción
+      const emocionOriginal = res.emotion;
+      console.log('Emoción recibida de la API:', emocionOriginal);
+      
+      // Capitalizar para mostrar
+      const emocionMostrar = emocionOriginal.charAt(0).toUpperCase() + emocionOriginal.slice(1);
+      resultEmotion.textContent = emocionMostrar;
+      
+      // Buscar el mensaje
+      let info = EMOTION_MESSAGES[emocionOriginal];
+      console.log('Información encontrada:', info);
+      
+      // Si no se encuentra, intentar con otras variantes
+      if (!info) {
+          info = EMOTION_MESSAGES[emocionOriginal.toLowerCase()];
+          console.log('Intentando con minúsculas:', info);
+      }
+      
+      if (!info) {
+          console.log('No se encontró información para la emoción:', emocionOriginal);
+          info = {
+              mensaje: '¡Detecté alegría en tus palabras! Es maravilloso verte así.',
+              recomendaciones: [
+                  'Comparte tu alegría con los demás, las emociones positivas son contagiosas.',
+                  'Aprovecha este momento para hacer algo que disfrutes.',
+                  'Recuerda qué te hizo sentir así, puede ayudarte en otros momentos.'
+              ]
+          };
+      }
+      
       let recomendacion = '';
       if (info.recomendaciones && info.recomendaciones.length > 0) {
         const idx = Math.floor(Math.random() * info.recomendaciones.length);
         recomendacion = info.recomendaciones[idx];
       }
-      if (info.mensaje || recomendacion) {
-        msgDiv.innerHTML = `<p>${info.mensaje || ''}</p><p><strong>Recomendación:</strong> ${recomendacion || 'Intenta reflexionar sobre cómo te sientes.'}</p>`;
+      
+      // Obtener el mensaje y la recomendación
+      if (info && info.mensaje) {
+        const mensaje = info.mensaje;
+        let recomendacion = '';
+        
+        if (info.recomendaciones && info.recomendaciones.length > 0) {
+          const idx = Math.floor(Math.random() * info.recomendaciones.length);
+          recomendacion = info.recomendaciones[idx];
+        }
+
+        msgDiv.innerHTML = `
+          <div class="mensaje">${mensaje}</div>
+          ${recomendacion ? `<div class="recomendacion"><strong>Recomendación:</strong> ${recomendacion}</div>` : ''}
+        `;
       } else {
-        msgDiv.innerHTML = '<p>No se encontró una recomendación para esta emoción.</p>';
+        msgDiv.innerHTML = '<div class="mensaje">Lo siento, no pude encontrar un mensaje para esta emoción.</div>';
       }
       resultConfidence.textContent = (res.confidence * 100).toFixed(1) + '%';
       resultMethod.textContent = res.method === 'ai' ? 'IA' : (res.method === 'dictionary' ? 'Diccionario' : res.method);
+      
+      // Construir el mensaje HTML
+      let mensajeHTML = '';
+      if (info.mensaje) {
+          mensajeHTML += `<div class="mensaje">${info.mensaje}</div>`;
+      }
+      if (info.recomendaciones && info.recomendaciones.length > 0) {
+          const recomendacion = info.recomendaciones[Math.floor(Math.random() * info.recomendaciones.length)];
+          mensajeHTML += `<div class="recomendacion"><strong>Recomendación:</strong> ${recomendacion}</div>`;
+      }
+      
+      // Mostrar el mensaje
+      const msgDiv = document.getElementById('result-message');
+      msgDiv.innerHTML = mensajeHTML;
+      
+      // Asegurarnos de que la tarjeta se muestre
       resultCard.classList.remove('hidden');
-      mostrarHistorial(); // Actualizar historial tras registrar emoción
+      resultCard.style.display = 'block';
+      
+      // Actualizar historial
+      mostrarHistorial();
     } catch (err) {
       alert('Debes iniciar sesión para analizar emociones.');
     } finally {
