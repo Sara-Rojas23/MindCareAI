@@ -150,14 +150,22 @@
     <script>
         // Forzar recarga de scripts sin caché
         const timestamp = Date.now();
-        const authScript = document.createElement('script');
-        authScript.src = 'mindcare-auth.js?t=' + timestamp;
-        document.body.appendChild(authScript);
         
-        authScript.onload = function() {
-            const historyScript = document.createElement('script');
-            historyScript.src = 'history.js?t=' + timestamp;
-            document.body.appendChild(historyScript);
+        // Cargar utilidades compartidas primero
+        const utilsScript = document.createElement('script');
+        utilsScript.src = 'shared-utils.js?t=' + timestamp;
+        document.body.appendChild(utilsScript);
+        
+        utilsScript.onload = function() {
+            const authScript = document.createElement('script');
+            authScript.src = 'mindcare-auth.js?t=' + timestamp;
+            document.body.appendChild(authScript);
+            
+            authScript.onload = function() {
+                const historyScript = document.createElement('script');
+                historyScript.src = 'history.js?t=' + timestamp;
+                document.body.appendChild(historyScript);
+            };
         };
     </script>
 </body>

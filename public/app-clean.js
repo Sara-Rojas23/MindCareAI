@@ -14,6 +14,8 @@ const newAnalysisBtn = document.getElementById('newAnalysisBtn');
 
 // Estado de la aplicación
 let isAnalyzing = false;
+let showingFullHistory = false; // Para controlar si mostramos 5 o todas las entradas
+let allHistoryEntries = []; // Guardar todas las entradas
 
 // Inicialización
 document.addEventListener('DOMContentLoaded', function() {
@@ -99,6 +101,12 @@ function initializeApp() {
     const logoutBtn = document.getElementById('logoutBtn');
     if (logoutBtn) {
         logoutBtn.addEventListener('click', handleLogout);
+    }
+    
+    // Botón de Ver Historial en el navbar
+    const navHistoryBtn = document.getElementById('navHistoryBtn');
+    if (navHistoryBtn) {
+        navHistoryBtn.addEventListener('click', toggleFullHistory);
     }
     
     console.log('✅ Aplicación inicializada correctamente');
@@ -256,39 +264,7 @@ function displayResults(data) {
     }, 500);
 }
 
-// Obtener emoji según emoción
-function getEmotionEmoji(emotion) {
-    if (!emotion) return '🎭';
-    
-    const emotionLower = emotion.toLowerCase();
-    
-    const emojis = {
-        // Español
-        'alegría': '😊',
-        'tristeza': '😢',
-        'enojo': '😠',
-        'miedo': '😨',
-        'sorpresa': '😲',
-        'disgusto': '😖',
-        'ansiedad': '😰',
-        'estrés': '😓',
-        'calma': '😌',
-        'nostalgia': '🥺',
-        // Inglés (por compatibilidad)
-        'joy': '😊',
-        'happiness': '😄',
-        'sadness': '😢',
-        'anger': '😠',
-        'fear': '😨',
-        'surprise': '😲',
-        'love': '❤️',
-        'neutral': '😐',
-        'anxiety': '😰',
-        'stress': '😓'
-    };
-    
-    return emojis[emotionLower] || '🎭';
-}
+// Nota: getEmotionEmoji() ahora está en shared-utils.js
 
 // Generar retroalimentación
 function generateFeedback(emotion, confidence) {
@@ -521,15 +497,26 @@ function displayHistoryEntries(entries) {
     historyEntries.innerHTML = '';
     historyEntries.style.display = 'grid';
     
-    // Mostrar las últimas 5 entradas
-    const recentEntries = entries.slice(0, 5);
+    // Guardar todas las entradas globalmente
+    allHistoryEntries = entries;
     
-    recentEntries.forEach(entry => {
+    // Mostrar 5 o todas según el estado
+    const entriesToShow = showingFullHistory ? entries : entries.slice(0, 5);
+    
+    entriesToShow.forEach(entry => {
         const entryElement = createHistoryEntry(entry);
         historyEntries.appendChild(entryElement);
     });
     
-    console.log('✅ Entradas mostradas correctamente');
+    // Actualizar texto del botón según el estado
+    const navHistoryBtn = document.getElementById('navHistoryBtn');
+    if (navHistoryBtn && entries.length > 5) {
+        navHistoryBtn.textContent = showingFullHistory ? 
+            `📊 Ver menos (${entries.length} totales)` : 
+            `📊 Ver Historial Completo (${entries.length} entradas)`;
+    }
+    
+    console.log(`✅ Mostrando ${entriesToShow.length} de ${entries.length} entradas`);
 }
 
 // Crear elemento HTML para una entrada del historial
@@ -537,15 +524,9 @@ function createHistoryEntry(entry) {
     const div = document.createElement('div');
     div.className = 'history-entry';
     
-    const emoji = getEmotionEmoji(entry.emotion);
-    const date = new Date(entry.created_at);
-    const formattedDate = date.toLocaleDateString('es-ES', {
-        day: '2-digit',
-        month: 'short',
-        year: 'numeric',
-        hour: '2-digit',
-        minute: '2-digit'
-    });
+    const emoji = getEmotionEmoji(entry.emotion); // Función compartida
+    const formattedDate = formatDate(entry.created_at); // Función compartida
+    const preview = truncateText(entry.text, 150); // Función compartida
     
     div.innerHTML = `
         <div class="history-entry-header">
@@ -555,7 +536,7 @@ function createHistoryEntry(entry) {
             </div>
             <span class="history-entry-date">${formattedDate}</span>
         </div>
-        <div class="history-entry-text">"${entry.text}"</div>
+        <div class="history-entry-text">"${preview}"</div>
         <div class="history-entry-confidence">
             Confianza: ${Math.round(entry.confidence)}%
         </div>
@@ -564,5 +545,29 @@ function createHistoryEntry(entry) {
     return div;
 }
 
-console.log('✅ Script de aplicación cargado');
+// Alternar entre mostrar todas las entradas o solo las últimas 5
+function toggleFullHistory() {
+    console.log('🔄 Alternando vista de historial');
+    
+    // Cambiar el estado
+    showingFullHistory = !showingFullHistory;
+    
+    // Si no hay entradas cargadas, cargar primero
+    if (allHistoryEntries.length === 0) {
+        loadHistoryAfterAnalysis();
+        return;
+    }
+    
+    // Mostrar el historial con el nuevo estado
+    displayHistoryEntries(allHistoryEntries);
+    
+    // Hacer scroll suave hacia la sección de historial
+    const historySection = document.getElementById('historySection');
+    if (historySection && historySection.style.display !== 'none') {
+        historySection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+    
+    console.log(`✅ Mostrando ${showingFullHistory ? 'TODAS' : 'últimas 5'} las entradas`);
+}
 
+console.log('✅ Script de aplicación cargado');
