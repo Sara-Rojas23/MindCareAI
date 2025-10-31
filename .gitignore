@@ -5,3 +5,6 @@ node_modules/
 .vscode/
 dist/
 build/
+# Backups de base de datos (no subir a Git)
+backups/*.db
+!backups/.gitkeep

@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestión de Backups - MindCare AI</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        .backup-container {
+            max-width: 900px;
+            margin: 40px auto;
+            padding: 20px;
+        }
+        
+        .backup-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+        
+        .backup-actions {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+        
+        .action-btn {
+            padding: 15px 25px;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        
+        .btn-create {
+            background: #10b981;
+            color: white;
+        }
+        
+        .btn-create:hover {
+            background: #059669;
+            transform: translateY(-2px);
+        }
+        
+        .btn-refresh {
+            background: #3b82f6;
+            color: white;
+        }
+        
+        .btn-refresh:hover {
+            background: #2563eb;
+            transform: translateY(-2px);
+        }
+        
+        .btn-back {
+            background: #6b7280;
+            color: white;
+        }
+        
+        .btn-back:hover {
+            background: #4b5563;
+            transform: translateY(-2px);
+        }
+        
+        .backups-list {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        .backup-item {
+            background: #f9fafb;
+            border: 2px solid #e5e7eb;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 15px;
+            transition: all 0.3s;
+        }
+        
+        .backup-item:hover {
+            border-color: #667eea;
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.2);
+        }
+        
+        .backup-info {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        
+        .backup-info-item {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .backup-info-label {
+            font-size: 12px;
+            color: #6b7280;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+        
+        .backup-info-value {
+            font-size: 14px;
+            color: #1f2937;
+            margin-top: 3px;
+        }
+        
+        .backup-buttons {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        
+        .backup-btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .btn-download {
+            background: #3b82f6;
+            color: white;
+        }
+        
+        .btn-download:hover {
+            background: #2563eb;
+        }
+        
+        .btn-restore {
+            background: #f59e0b;
+            color: white;
+        }
+        
+        .btn-restore:hover {
+            background: #d97706;
+        }
+        
+        .btn-delete {
+            background: #ef4444;
+            color: white;
+        }
+        
+        .btn-delete:hover {
+            background: #dc2626;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #6b7280;
+        }
+        
+        .spinner {
+            border: 3px solid #f3f4f6;
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 15px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #6b7280;
+        }
+        
+        .empty-icon {
+            font-size: 64px;
+            margin-bottom: 20px;
+        }
+        
+        .alert {
+            padding: 15px 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .alert-success {
+            background: #d1fae5;
+            border: 1px solid #10b981;
+            color: #065f46;
+        }
+        
+        .alert-error {
+            background: #fee2e2;
+            border: 1px solid #ef4444;
+            color: #991b1b;
+        }
+        
+        .alert-warning {
+            background: #fef3c7;
+            border: 1px solid #f59e0b;
+            color: #92400e;
+        }
+    </style>
+</head>
+<body>
+    <div class="backup-container">
+        <div class="backup-header">
+            <h1>💾 Gestión de Backups</h1>
+            <p>Crea, descarga y restaura copias de seguridad de tu base de datos</p>
+        </div>
+
+        <div id="alertContainer"></div>
+
+        <div class="backup-actions">
+            <button onclick="createBackup()" class="action-btn btn-create">
+                <span>💾</span>
+                <span>Crear Backup</span>
+            </button>
+            <button onclick="loadBackups()" class="action-btn btn-refresh">
+                <span>🔄</span>
+                <span>Actualizar Lista</span>
+            </button>
+            <button onclick="window.location.href='/'" class="action-btn btn-back">
+                <span>🏠</span>
+                <span>Volver al Inicio</span>
+            </button>
+        </div>
+
+        <div class="backups-list">
+            <h2>📋 Backups Disponibles</h2>
+            <div id="backupsContainer">
+                <div class="loading">
+                    <div class="spinner"></div>
+                    <p>Cargando backups...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE_URL = '/api';
+
+        // Cargar backups al iniciar
+        document.addEventListener('DOMContentLoaded', () => {
+            checkAuth();
+            loadBackups();
+        });
+
+        function checkAuth() {
+            const token = localStorage.getItem('mindcare_token');
+            if (!token) {
+                window.location.href = '/login.html';
+            }
+        }
+
+        function getAuthHeaders() {
+            return {
+                'Authorization': `Bearer ${localStorage.getItem('mindcare_token')}`,
+                'Content-Type': 'application/json'
+            };
+        }
+
+        function showAlert(message, type = 'success') {
+            const alertContainer = document.getElementById('alertContainer');
+            const icons = {
+                success: '✅',
+                error: '❌',
+                warning: '⚠️'
+            };
+            
+            const alert = document.createElement('div');
+            alert.className = `alert alert-${type}`;
+            alert.innerHTML = `
+                <span style="font-size: 24px;">${icons[type]}</span>
+                <span>${message}</span>
+            `;
+            
+            alertContainer.innerHTML = '';
+            alertContainer.appendChild(alert);
+            
+            setTimeout(() => {
+                alert.remove();
+            }, 5000);
+        }
+
+        async function loadBackups() {
+            const container = document.getElementById('backupsContainer');
+            container.innerHTML = '<div class="loading"><div class="spinner"></div><p>Cargando backups...</p></div>';
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/backup/list`, {
+                    headers: getAuthHeaders()
+                });
+
+                const data = await response.json();
+
+                if (!data.success) {
+                    throw new Error(data.error || 'Error al cargar backups');
+                }
+
+                if (data.backups.length === 0) {
+                    container.innerHTML = `
+                        <div class="empty-state">
+                            <div class="empty-icon">📦</div>
+                            <h3>No hay backups disponibles</h3>
+                            <p>Crea tu primer backup para comenzar</p>
+                        </div>
+                    `;
+                    return;
+                }
+
+                container.innerHTML = '';
+                data.backups.forEach(backup => {
+                    const item = createBackupItem(backup);
+                    container.appendChild(item);
+                });
+
+            } catch (error) {
+                console.error('Error cargando backups:', error);
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-icon">❌</div>
+                        <h3>Error al cargar backups</h3>
+                        <p>${error.message}</p>
+                    </div>
+                `;
+            }
+        }
+
+        function createBackupItem(backup) {
+            const div = document.createElement('div');
+            div.className = 'backup-item';
+            
+            const createdDate = new Date(backup.createdAt);
+            const sizeKB = (backup.size / 1024).toFixed(2);
+            
+            div.innerHTML = `
+                <div class="backup-info">
+                    <div class="backup-info-item">
+                        <span class="backup-info-label">Archivo</span>
+                        <span class="backup-info-value">${backup.filename}</span>
+                    </div>
+                    <div class="backup-info-item">
+                        <span class="backup-info-label">Fecha de Creación</span>
+                        <span class="backup-info-value">${createdDate.toLocaleString('es-ES')}</span>
+                    </div>
+                    <div class="backup-info-item">
+                        <span class="backup-info-label">Tamaño</span>
+                        <span class="backup-info-value">${sizeKB} KB</span>
+                    </div>
+                    <div class="backup-info-item">
+                        <span class="backup-info-label">Última Modificación</span>
+                        <span class="backup-info-value">${new Date(backup.modifiedAt).toLocaleString('es-ES')}</span>
+                    </div>
+                </div>
+                <div class="backup-buttons">
+                    <button onclick="downloadBackup('${backup.filename}')" class="backup-btn btn-download">
+                        📥 Descargar
+                    </button>
+                    <button onclick="restoreBackup('${backup.filename}')" class="backup-btn btn-restore">
+                        🔄 Restaurar
+                    </button>
+                    <button onclick="deleteBackup('${backup.filename}')" class="backup-btn btn-delete">
+                        🗑️ Eliminar
+                    </button>
+                </div>
+            `;
+            
+            return div;
+        }
+
+        async function createBackup() {
+            if (!confirm('¿Crear un nuevo backup de la base de datos?')) return;
+
+            showAlert('Creando backup...', 'warning');
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/backup/create`, {
+                    method: 'POST',
+                    headers: getAuthHeaders()
+                });
+
+                const data = await response.json();
+
+                if (!data.success) {
+                    throw new Error(data.error || 'Error al crear backup');
+                }
+
+                showAlert('✅ Backup creado exitosamente: ' + data.backup.filename, 'success');
+                await loadBackups();
+
+            } catch (error) {
+                console.error('Error creando backup:', error);
+                showAlert('❌ Error al crear backup: ' + error.message, 'error');
+            }
+        }
+
+        async function downloadBackup(filename) {
+            try {
+                showAlert('📥 Descargando: ' + filename, 'warning');
+                
+                const response = await fetch(`${API_BASE_URL}/backup/download/${filename}`, {
+                    method: 'GET',
+                    headers: getAuthHeaders()
+                });
+
+                if (!response.ok) {
+                    throw new Error('Error al descargar el archivo');
+                }
+
+                // Convertir la respuesta a blob
+                const blob = await response.blob();
+                
+                // Crear URL temporal del blob
+                const url = window.URL.createObjectURL(blob);
+                
+                // Crear enlace temporal y hacer click
+                const a = document.createElement('a');
+                a.style.display = 'none';
+                a.href = url;
+                a.download = filename;
+                document.body.appendChild(a);
+                a.click();
+                
+                // Limpiar
+                window.URL.revokeObjectURL(url);
+                document.body.removeChild(a);
+                
+                showAlert('✅ Descarga completada: ' + filename, 'success');
+
+            } catch (error) {
+                console.error('Error descargando backup:', error);
+                showAlert('❌ Error al descargar backup: ' + error.message, 'error');
+            }
+        }
+
+        async function restoreBackup(filename) {
+            if (!confirm(`⚠️ ADVERTENCIA: Esto restaurará la base de datos desde "${filename}".\n\n¿Estás seguro? Se creará un backup de seguridad antes de restaurar.`)) {
+                return;
+            }
+
+            showAlert('🔄 Restaurando backup...', 'warning');
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/backup/restore/${filename}`, {
+                    method: 'POST',
+                    headers: getAuthHeaders()
+                });
+
+                const data = await response.json();
+
+                if (!data.success) {
+                    throw new Error(data.error || 'Error al restaurar backup');
+                }
+
+                showAlert(`✅ Base de datos restaurada desde: ${filename}\n🛡️ Backup de seguridad: ${data.safetyBackup}`, 'success');
+                
+                setTimeout(() => {
+                    if (confirm('Restauración completada. ¿Recargar la página?')) {
+                        window.location.reload();
+                    }
+                }, 2000);
+
+            } catch (error) {
+                console.error('Error restaurando backup:', error);
+                showAlert('❌ Error al restaurar backup: ' + error.message, 'error');
+            }
+        }
+
+        async function deleteBackup(filename) {
+            if (!confirm(`¿Eliminar el backup "${filename}"?\n\nEsta acción no se puede deshacer.`)) {
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/backup/delete/${filename}`, {
+                    method: 'DELETE',
+                    headers: getAuthHeaders()
+                });
+
+                const data = await response.json();
+
+                if (!data.success) {
+                    throw new Error(data.error || 'Error al eliminar backup');
+                }
+
+                showAlert('🗑️ Backup eliminado: ' + filename, 'success');
+                await loadBackups();
+
+            } catch (error) {
+                console.error('Error eliminando backup:', error);
+                showAlert('❌ Error al eliminar backup: ' + error.message, 'error');
+            }
+        }
+    </script>
+</body>
+</html>

@@ -22,9 +22,11 @@ app.use(express.static(path.join(__dirname, 'public')));
 // Rutas
 const emotionRoutes = require('./src/routes/emotion');
 const authRoutes = require('./src/routes/auth');
+const backupRoutes = require('./src/routes/backup');
 
 app.use('/api/emotions', emotionRoutes);
 app.use('/api/auth', authRoutes);
+app.use('/api/backup', backupRoutes);
 
 // Ruta principal
 app.get('/', (req, res) => {
