@@ -90,10 +90,10 @@ class User {
             }
 
             // Verificar si el usuario está bloqueado
-            const isLocked = await this.isUserLocked(email);
-            if (isLocked) {
-                const remainingTime = await this.getRemainingLockTime(email);
-                throw new Error(`Cuenta bloqueada por múltiples intentos fallidos. Intenta de nuevo en ${remainingTime} segundos.`);
+            const estaBloqueado = await this.isUserLocked(email);
+            if (estaBloqueado) {
+                const tiempoRestante = await this.getRemainingLockTime(email);
+                throw new Error(`Cuenta bloqueada por múltiples intentos fallidos. Intenta de nuevo en ${tiempoRestante} segundos.`);
             }
 
             const user = await this.findByEmail(email);
@@ -101,15 +101,25 @@ class User {
                 throw new Error('Credenciales inválidas');
             }
 
-            const isPasswordValid = await bcrypt.compare(password, user.password);
-            if (!isPasswordValid) {
-                // Incrementar intentos fallidos
+            const esPasswordValido = await bcrypt.compare(password, user.password);
+            if (!esPasswordValido) {
+                // Obtener intentos actuales y sumar 1
+                const intentos = await this.getFailedAttempts(email) + 1;
+                
+                // Incrementar contador en la base de datos
                 await this.incrementFailedAttempts(email);
                 
-                // Verificar si ahora está bloqueado
-                const nowLocked = await this.isUserLocked(email);
-                if (nowLocked) {
+                // Si llegó a 3 intentos, bloquear
+                if (intentos >= 3) {
                     throw new Error('Demasiados intentos fallidos. Cuenta bloqueada por 30 segundos.');
+                }
+                
+                // Mostrar advertencia según intentos restantes
+                const restantes = 3 - intentos;
+                if (restantes === 2) {
+                    throw new Error('Credenciales inválidas. Te quedan 2 intentos antes de que tu cuenta se bloquee por 30 segundos.');
+                } else if (restantes === 1) {
+                    throw new Error('Credenciales inválidas. Te queda 1 intento antes de que tu cuenta se bloquee por 30 segundos.');
                 }
                 
                 throw new Error('Credenciales inválidas');
@@ -237,39 +247,43 @@ class User {
     // Verificar si el usuario está bloqueado
     static async isUserLocked(email) {
         try {
-            const sql = 'SELECT failed_attempts, locked_until FROM users WHERE email = ?';
-            const user = await database.get(sql, [email]);
+            const sql = 'SELECT locked_until FROM users WHERE email = ?';
+            const usuario = await database.get(sql, [email]);
             
-            if (!user) {
+            if (!usuario || !usuario.locked_until) {
                 return false;
             }
 
-            // Si no hay bloqueo, retornar false
-            if (!user.locked_until) {
-                return false;
-            }
+            const ahora = Date.now();
+            const tiempoBloqueo = parseInt(usuario.locked_until);
 
-            const now = Date.now();
-            const lockedUntil = parseInt(user.locked_until);
-
-            // Si el tiempo de bloqueo ya pasó, resetear intentos
-            if (now >= lockedUntil) {
+            // Si ya pasó el tiempo de bloqueo, desbloquear
+            if (ahora >= tiempoBloqueo) {
                 await this.resetFailedAttempts(email);
                 return false;
             }
 
-            // Usuario todavía bloqueado
             return true;
         } catch (error) {
             throw new Error(`Error al verificar bloqueo: ${error.message}`);
         }
     }
 
+    // Obtener número de intentos fallidos actuales
+    static async getFailedAttempts(email) {
+        try {
+            const sql = 'SELECT failed_attempts FROM users WHERE email = ?';
+            const usuario = await database.get(sql, [email]);
+            return usuario ? (usuario.failed_attempts || 0) : 0;
+        } catch (error) {
+            throw new Error(`Error al obtener intentos fallidos: ${error.message}`);
+        }
+    }
+
     // Incrementar intentos fallidos
     static async incrementFailedAttempts(email) {
         try {
-            // Calcular timestamp de bloqueo (30 segundos desde ahora)
-            const lockUntilTimestamp = Date.now() + (30 * 1000);
+            const tiempoBloqueo = Date.now() + (30 * 1000); // 30 segundos
             
             const sql = `
                 UPDATE users 
@@ -281,7 +295,7 @@ class User {
                     END
                 WHERE email = ?
             `;
-            await database.run(sql, [lockUntilTimestamp, email]);
+            await database.run(sql, [tiempoBloqueo, email]);
         } catch (error) {
             throw new Error(`Error al incrementar intentos fallidos: ${error.message}`);
         }
@@ -290,11 +304,7 @@ class User {
     // Resetear intentos fallidos
     static async resetFailedAttempts(email) {
         try {
-            const sql = `
-                UPDATE users 
-                SET failed_attempts = 0, locked_until = NULL
-                WHERE email = ?
-            `;
+            const sql = 'UPDATE users SET failed_attempts = 0, locked_until = NULL WHERE email = ?';
             await database.run(sql, [email]);
         } catch (error) {
             throw new Error(`Error al resetear intentos: ${error.message}`);
@@ -305,17 +315,14 @@ class User {
     static async getRemainingLockTime(email) {
         try {
             const sql = 'SELECT locked_until FROM users WHERE email = ?';
-            const user = await database.get(sql, [email]);
+            const usuario = await database.get(sql, [email]);
             
-            if (!user || !user.locked_until) {
+            if (!usuario || !usuario.locked_until) {
                 return 0;
             }
 
-            const now = Date.now();
-            const lockedUntil = parseInt(user.locked_until);
-            const remainingMs = lockedUntil - now;
-            
-            return remainingMs > 0 ? Math.ceil(remainingMs / 1000) : 0;
+            const diferencia = parseInt(usuario.locked_until) - Date.now();
+            return diferencia > 0 ? Math.ceil(diferencia / 1000) : 0;
         } catch (error) {
             throw new Error(`Error al obtener tiempo de bloqueo: ${error.message}`);
         }
