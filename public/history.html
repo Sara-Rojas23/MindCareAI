@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Historial de Emociones - MindCare AI</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <!-- Barra de navegación para usuarios autenticados -->
+        <nav id="authNavbar" class="navbar" style="display: none;">
+            <div class="navbar-content">
+                <div class="navbar-brand">🧠 MindCare AI</div>
+                <div class="navbar-menu">
+                    <a href="/" class="nav-link">📝 Diario</a>
+                    <a href="history.html" class="nav-link active">📊 Historial</a>
+                </div>
+                <div class="navbar-user">
+                    <span id="userWelcome" class="user-welcome">Cargando...</span>
+                    <button id="logoutBtn" class="logout-btn">Cerrar Sesión</button>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Header para usuarios no autenticados (redirigir a login) -->
+        <header id="publicHeader" style="display: none;">
+            <h1>🔐 Acceso Restringido</h1>
+            <p>Necesitas iniciar sesión para ver tu historial de emociones</p>
+            <div class="auth-buttons">
+                <a href="login.html" class="auth-link primary">Iniciar Sesión</a>
+            </div>
+        </header>
+
+        <main id="historyMain" style="display: none;">
+            <!-- Encabezado del historial -->
+            <section class="history-header">
+                <h1>📊 Mi Historial de Emociones</h1>
+                <p>Revisa tu progreso emocional y patrones a lo largo del tiempo</p>
+            </section>
+
+            <!-- Filtros y controles -->
+            <section class="history-controls">
+                <div class="controls-row">
+                    <div class="filter-group">
+                        <label for="periodFilter">Período:</label>
+                        <select id="periodFilter">
+                            <option value="7">Últimos 7 días</option>
+                            <option value="30" selected>Últimos 30 días</option>
+                            <option value="90">Últimos 3 meses</option>
+                            <option value="365">Último año</option>
+                            <option value="all">Todo el historial</option>
+                        </select>
+                    </div>
+                    
+                    <div class="filter-group">
+                        <label for="emotionFilter">Emoción:</label>
+                        <select id="emotionFilter">
+                            <option value="all">Todas las emociones</option>
+                            <option value="alegría">😊 Alegría</option>
+                            <option value="tristeza">😢 Tristeza</option>
+                            <option value="enojo">😠 Enojo</option>
+                            <option value="miedo">😰 Miedo</option>
+                            <option value="sorpresa">😮 Sorpresa</option>
+                            <option value="asco">🤢 Asco</option>
+                            <option value="calma">😌 Calma</option>
+                            <option value="estrés">😫 Estrés</option>
+                            <option value="ansiedad">😰 Ansiedad</option>
+                        </select>
+                    </div>
+                    
+                    <button id="refreshHistory" class="btn-refresh">🔄 Actualizar</button>
+                </div>
+            </section>
+
+            <!-- Estado de carga -->
+            <div id="loadingState" class="loading-state" style="display: none;">
+                <div class="spinner"></div>
+                <p>Cargando tu historial...</p>
+            </div>
+
+            <!-- Estado vacío -->
+            <div id="emptyState" class="empty-state" style="display: none;">
+                <div class="empty-icon">📝</div>
+                <h3>Aún no tienes entradas en tu diario</h3>
+                <p>Comienza a escribir sobre tus emociones para ver tu progreso aquí.</p>
+                <a href="/" class="btn-primary">✍️ Escribir mi primera entrada</a>
+            </div>
+
+            <!-- Lista de entradas del historial -->
+            <section id="historyList" class="history-list" style="display: none;">
+                <div class="history-stats">
+                    <div class="stat-card">
+                        <div class="stat-icon">📊</div>
+                        <div class="stat-info">
+                            <div class="stat-number" id="totalEntries">0</div>
+                            <div class="stat-label">Entradas totales</div>
+                        </div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-icon">😊</div>
+                        <div class="stat-info">
+                            <div class="stat-number" id="topEmotion">-</div>
+                            <div class="stat-label">Emoción principal</div>
+                        </div>
+                    </div>
+                    
+                    <div class="stat-card">
+                        <div class="stat-icon">📈</div>
+                        <div class="stat-info">
+                            <div class="stat-number" id="avgConfidence">0%</div>
+                            <div class="stat-label">Confianza promedio</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Entradas del historial -->
+                <div id="entriesContainer" class="entries-container">
+                    <!-- Las entradas se cargarán dinámicamente aquí -->
+                </div>
+
+                <!-- Paginación -->
+                <div id="pagination" class="pagination" style="display: none;">
+                    <button id="prevPage" class="btn-page" disabled>← Anterior</button>
+                    <span id="pageInfo" class="page-info">Página 1 de 1</span>
+                    <button id="nextPage" class="btn-page" disabled>Siguiente →</button>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Modales para mostrar detalles de entradas -->
+    <div id="entryModal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modalTitle">Detalles de la entrada</h3>
+                <button id="closeModal" class="close-btn">×</button>
+            </div>
+            <div class="modal-body">
+                <div id="modalContent">
+                    <!-- Contenido de la entrada se carga aquí -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script>
+        // Forzar recarga de scripts sin caché
+        const timestamp = Date.now();
+        const authScript = document.createElement('script');
+        authScript.src = 'auth.js?t=' + timestamp;
+        document.body.appendChild(authScript);
+        
+        authScript.onload = function() {
+            const historyScript = document.createElement('script');
+            historyScript.src = 'history.js?t=' + timestamp;
+            document.body.appendChild(historyScript);
+        };
+    </script>
+</body>
+</html>

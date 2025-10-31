@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Diagnóstico de Historial - MindCare AI</title>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            margin: 20px;
+            background-color: #f5f5f5;
+        }
+        .debug-panel {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        .btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        .btn:hover {
+            background: #5a67d8;
+        }
+        .result {
+            padding: 15px;
+            border-radius: 8px;
+            margin: 10px 0;
+            font-family: monospace;
+            font-size: 12px;
+            line-height: 1.4;
+        }
+        .success { background: #c6f6d5; color: #2f855a; }
+        .error { background: #fed7d7; color: #c53030; }
+        .info { background: #bee3f8; color: #2b6cb0; }
+        .warning { background: #faf089; color: #744210; }
+    </style>
+</head>
+<body>
+    <div class="debug-panel">
+        <h2>🔍 Diagnóstico de Historial</h2>
+        
+        <div>
+            <button class="btn" onclick="checkAuth()">1. Verificar Autenticación</button>
+            <button class="btn" onclick="testAnalysis()">2. Probar Análisis</button>
+            <button class="btn" onclick="testHistory()">3. Probar Historial</button>
+            <button class="btn" onclick="runFullTest()">🚀 Test Completo</button>
+        </div>
+        
+        <div id="results"></div>
+    </div>
+
+    <script>
+        const API_BASE_URL = '/api';
+        let results = document.getElementById('results');
+
+        function addResult(message, type = 'info') {
+            const div = document.createElement('div');
+            div.className = `result ${type}`;
+            div.textContent = `${new Date().toLocaleTimeString()} - ${message}`;
+            results.appendChild(div);
+            results.scrollTop = results.scrollHeight;
+        }
+
+        function clearResults() {
+            results.innerHTML = '';
+        }
+
+        async function checkAuth() {
+            clearResults();
+            addResult('🔍 Verificando autenticación...', 'info');
+            
+            const token = localStorage.getItem('mindcare_token');
+            const user = localStorage.getItem('mindcare_user');
+            
+            if (!token) {
+                addResult('❌ No se encontró token en localStorage', 'error');
+                return false;
+            }
+            
+            if (!user) {
+                addResult('❌ No se encontraron datos de usuario en localStorage', 'error');
+                return false;
+            }
+            
+            addResult('✅ Token encontrado en localStorage', 'success');
+            
+            try {
+                const userData = JSON.parse(user);
+                addResult(`✅ Usuario: ${userData.name} (${userData.email})`, 'success');
+                
+                // Probar endpoint de verificación
+                const response = await fetch(`${API_BASE_URL}/auth/verify`, {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    addResult('✅ Token válido según servidor', 'success');
+                    addResult(`✅ Usuario verificado: ${data.data.user.name}`, 'success');
+                    return true;
+                } else {
+                    addResult(`❌ Token inválido - HTTP ${response.status}`, 'error');
+                    return false;
+                }
+                
+            } catch (error) {
+                addResult(`❌ Error verificando auth: ${error.message}`, 'error');
+                return false;
+            }
+        }
+
+        async function testAnalysis() {
+            addResult('🧠 Probando análisis de emociones...', 'info');
+            
+            const token = localStorage.getItem('mindcare_token');
+            if (!token) {
+                addResult('❌ No hay token - haz login primero', 'error');
+                return;
+            }
+            
+            try {
+                const response = await fetch(`${API_BASE_URL}/emotions/analyze`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        text: 'Hoy me siento muy bien, es un día perfecto para trabajar en mis proyectos.'
+                    })
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    addResult('✅ Análisis completado exitosamente', 'success');
+                    addResult(`📊 Emoción detectada: ${data.data.analysis.primaryEmotion} (${data.data.analysis.confidence}%)`, 'info');
+                    addResult('💾 Verificar en logs del servidor si se guardó en BD', 'warning');
+                } else {
+                    addResult(`❌ Error en análisis - HTTP ${response.status}`, 'error');
+                }
+                
+            } catch (error) {
+                addResult(`❌ Error en análisis: ${error.message}`, 'error');
+            }
+        }
+
+        async function testHistory() {
+            addResult('📊 Probando obtención de historial...', 'info');
+            
+            const token = localStorage.getItem('mindcare_token');
+            if (!token) {
+                addResult('❌ No hay token - haz login primero', 'error');
+                return;
+            }
+            
+            try {
+                const response = await fetch(`${API_BASE_URL}/emotions/history`, {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                addResult(`📡 Respuesta HTTP: ${response.status} ${response.statusText}`, 'info');
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    addResult('✅ Historial obtenido exitosamente', 'success');
+                    addResult(`📋 Entradas encontradas: ${data.data?.entries?.length || 0}`, 'info');
+                    
+                    if (data.data?.entries?.length > 0) {
+                        data.data.entries.forEach((entry, index) => {
+                            addResult(`  ${index + 1}. ${entry.emotion} (${entry.confidence}%) - ${new Date(entry.created_at).toLocaleDateString()}`, 'info');
+                        });
+                    } else {
+                        addResult('⚠️ No hay entradas en el historial', 'warning');
+                    }
+                } else {
+                    const errorText = await response.text();
+                    addResult(`❌ Error obteniendo historial: ${errorText}`, 'error');
+                }
+                
+            } catch (error) {
+                addResult(`❌ Error en petición: ${error.message}`, 'error');
+            }
+        }
+
+        async function runFullTest() {
+            clearResults();
+            addResult('🚀 Ejecutando diagnóstico completo...', 'info');
+            
+            const authOk = await checkAuth();
+            if (!authOk) {
+                addResult('❌ Diagnóstico detenido - problemas de autenticación', 'error');
+                return;
+            }
+            
+            await new Promise(resolve => setTimeout(resolve, 1000));
+            await testAnalysis();
+            
+            await new Promise(resolve => setTimeout(resolve, 1000));
+            await testHistory();
+            
+            addResult('✅ Diagnóstico completo terminado', 'success');
+        }
+
+        // Auto-verificar al cargar
+        window.onload = function() {
+            addResult('📱 Herramienta de diagnóstico cargada', 'info');
+            addResult('💡 Ejecuta "Test Completo" para verificar todo el flujo', 'info');
+        }
+    </script>
+</body>
+</html>

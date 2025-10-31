@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Forzar Logout - MindCare AI</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="auth-container">
+        <div class="auth-card">
+            <header class="auth-header">
+                <h1>🧠 MindCare AI</h1>
+                <h2>Cerrar Sesión Forzado</h2>
+                <p>Esta página te permite cerrar tu sesión por completo</p>
+            </header>
+
+            <div class="logout-actions">
+                <button id="forceLogout" class="auth-btn">
+                    🚪 Cerrar Sesión Completa
+                </button>
+                
+                <button id="goHome" class="secondary-btn">
+                    🏠 Ir al Inicio
+                </button>
+            </div>
+
+            <div class="auth-links">
+                <p><strong>Enlaces directos:</strong></p>
+                <p><a href="login.html">🔐 Iniciar Sesión</a></p>
+                <p><a href="register.html">📝 Registrarse</a></p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            
+            // Forzar logout completo
+            document.getElementById('forceLogout').addEventListener('click', function() {
+                // Limpiar TODO el almacenamiento local
+                localStorage.clear();
+                sessionStorage.clear();
+                
+                // Limpiar cookies si existen
+                document.cookie.split(";").forEach(function(c) { 
+                    document.cookie = c.replace(/^ +/, "").replace(/=.*/, "=;expires=" + new Date().toUTCString() + ";path=/"); 
+                });
+                
+                alert('✅ Sesión cerrada completamente. Redirigiendo...');
+                window.location.href = '/login.html';
+            });
+
+            // Ir al inicio
+            document.getElementById('goHome').addEventListener('click', function() {
+                window.location.href = '/';
+            });
+        });
+    </script>
+</body>
+</html>

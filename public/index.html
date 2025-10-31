@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MindCare AI - Diario Emocional</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header>
+            <h1>🧠 MindCare AI</h1>
+            <p>Tu diario emocional inteligente</p>
+            
+            <!-- Botones para usuarios NO autenticados -->
+            <div id="authButtons" class="auth-buttons" style="display: flex;">
+                <a href="login.html" class="auth-link">Iniciar Sesión</a>
+                <a href="register.html" class="auth-link primary">Registrarse</a>
+            </div>
+            
+            <!-- Botón para usuarios autenticados -->
+            <div id="logoutButton" class="logout-container" style="display: none;">
+                <span id="userWelcome" class="user-welcome"></span>
+                <button id="logoutBtn" class="btn-logout">Cerrar Sesión 👋</button>
+            </div>
+        </header>
+
+        <main>
+            <section class="input-section">
+                <h2>¿Cómo te sientes hoy?</h2>
+                <p>Escribe sobre tu día y tus emociones. Nuestra IA te ayudará a entender mejor lo que sientes.</p>
+                
+                <form id="emotionForm">
+                    <div class="textarea-container">
+                        <textarea 
+                            id="emotionText" 
+                            placeholder="Ejemplo: 'Hoy fue un día difícil en el trabajo. Me sentí abrumado con todas las tareas que tenía pendientes, pero al final logré completar el proyecto que me tenía preocupado...'"
+                            maxlength="1000"
+                            rows="6"
+                        ></textarea>
+                        <div class="char-count">
+                            <span id="charCount">0</span>/1000
+                        </div>
+                    </div>
+                    
+                    <button type="submit" id="analyzeBtn">
+                        <span class="btn-text">Analizar mis emociones</span>
+                        <div class="loading-spinner" style="display: none;"></div>
+                    </button>
+                </form>
+            </section>
+
+            <section class="results-section" id="resultsSection">
+                <h2>🎭 Análisis de tus emociones</h2>
+                
+                <div class="emotion-result">
+                    <div class="emotion-card">
+                        <div class="emotion-emoji-container">
+                            <span class="emotion-emoji" id="emotionEmoji">😊</span>
+                        </div>
+                        <h3 class="emotion-name" id="emotionName">Alegría</h3>
+                        
+                        <div class="confidence-container">
+                            <div class="confidence-label">Nivel de confianza</div>
+                            <div class="confidence-bar">
+                                <div class="confidence-fill"></div>
+                            </div>
+                            <div class="confidence-value" id="confidenceValue">85%</div>
+                        </div>
+                    </div>
+                    
+                    <div class="feedback-card">
+                        <h4>💭 Retroalimentación</h4>
+                        <p id="feedbackText">Aquí aparecerá la retroalimentación personalizada según tu emoción.</p>
+                    </div>
+                </div>
+
+                <button id="newAnalysisBtn" class="btn-secondary">
+                    ✨ Realizar nuevo análisis
+                </button>
+            </section>
+        </main>
+
+        <footer>
+            <p>MindCare AI - MVP v1.0 | Desarrollado para el bienestar emocional</p>
+        </footer>
+    </div>
+
+    <!-- Modal de error -->
+    <div id="errorModal" class="modal" style="display: none;">
+        <div class="modal-content">
+            <span class="close" id="closeModal">&times;</span>
+            <h3>⚠️ Error</h3>
+            <p id="errorMessage"></p>
+        </div>
+    </div>
+
+    <!-- Modal de éxito -->
+    <div id="successModal" class="modal" style="display: none;">
+        <div class="modal-content success">
+            <span class="close" id="closeSuccessModal">&times;</span>
+            <h3>✅ Éxito</h3>
+            <p id="successMessage"></p>
+        </div>
+    </div>
+
+    <script src="mindcare-auth.js"></script>
+    <script src="app-clean.js"></script>
+</body>
+</html>

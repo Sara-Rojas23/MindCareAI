@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Debug UI - MindCare AI</title>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            margin: 20px;
+            background-color: #f5f5f5;
+        }
+        .debug-panel {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        .btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        .btn:hover {
+            background: #5a67d8;
+        }
+        .status {
+            padding: 10px;
+            border-radius: 5px;
+            margin: 10px 0;
+        }
+        .success { background: #c6f6d5; color: #2f855a; }
+        .error { background: #fed7d7; color: #c53030; }
+        .info { background: #bee3f8; color: #2b6cb0; }
+    </style>
+</head>
+<body>
+    <div class="debug-panel">
+        <h2>🔍 Debug Panel - Estado de Autenticación</h2>
+        
+        <div id="authStatus" class="status info">Verificando...</div>
+        
+        <button class="btn" onclick="checkAuthState()">🔄 Verificar Estado</button>
+        <button class="btn" onclick="forceUIUpdate()">🎨 Forzar Actualización UI</button>
+        <button class="btn" onclick="clearData()">🗑️ Limpiar Datos</button>
+        <button class="btn" onclick="goHome()">🏠 Ir al Inicio</button>
+        
+        <h3>Datos Actuales:</h3>
+        <pre id="userData" style="background: #f7fafc; padding: 10px; border-radius: 5px;"></pre>
+    </div>
+
+    <script>
+        function checkAuthState() {
+            const token = localStorage.getItem('mindcare_token');
+            const user = localStorage.getItem('mindcare_user');
+            
+            let status = '';
+            let statusClass = '';
+            
+            if (!token && !user) {
+                status = '🔓 No autenticado - Sin datos de sesión';
+                statusClass = 'error';
+            } else if (token && user) {
+                try {
+                    const userData = JSON.parse(user);
+                    status = `✅ Autenticado como: ${userData.name} (${userData.email})`;
+                    statusClass = 'success';
+                } catch (e) {
+                    status = '❌ Datos de usuario corruptos';
+                    statusClass = 'error';
+                }
+            } else {
+                status = '⚠️ Datos de autenticación incompletos';
+                statusClass = 'error';
+            }
+            
+            document.getElementById('authStatus').textContent = status;
+            document.getElementById('authStatus').className = `status ${statusClass}`;
+            
+            // Mostrar datos raw
+            document.getElementById('userData').textContent = 
+                `Token: ${token ? 'Presente' : 'Ausente'}\nUser Data: ${user || 'Ausente'}`;
+        }
+        
+        function forceUIUpdate() {
+            // Simular lo que hace la app principal
+            const token = localStorage.getItem('mindcare_token');
+            const user = localStorage.getItem('mindcare_user');
+            
+            if (token && user) {
+                alert('Datos encontrados. La app principal debería mostrar el botón de logout.');
+            } else {
+                alert('No hay datos. La app principal debería mostrar botones de login/registro.');
+            }
+            
+            // Ir a la página principal
+            setTimeout(() => {
+                window.location.href = '/';
+            }, 1000);
+        }
+        
+        function clearData() {
+            localStorage.clear();
+            sessionStorage.clear();
+            alert('Todos los datos limpiados');
+            checkAuthState();
+        }
+        
+        function goHome() {
+            window.location.href = '/';
+        }
+        
+        // Auto-verificar al cargar
+        window.onload = checkAuthState;
+    </script>
+</body>
+</html>
