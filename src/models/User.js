@@ -89,6 +89,13 @@ class User {
                 throw new Error('Email y contraseña son requeridos');
             }
 
+            // Verificar si el usuario está bloqueado
+            const isLocked = await this.isUserLocked(email);
+            if (isLocked) {
+                const remainingTime = await this.getRemainingLockTime(email);
+                throw new Error(`Cuenta bloqueada por múltiples intentos fallidos. Intenta de nuevo en ${remainingTime} segundos.`);
+            }
+
             const user = await this.findByEmail(email);
             if (!user) {
                 throw new Error('Credenciales inválidas');
@@ -96,8 +103,20 @@ class User {
 
             const isPasswordValid = await bcrypt.compare(password, user.password);
             if (!isPasswordValid) {
+                // Incrementar intentos fallidos
+                await this.incrementFailedAttempts(email);
+                
+                // Verificar si ahora está bloqueado
+                const nowLocked = await this.isUserLocked(email);
+                if (nowLocked) {
+                    throw new Error('Demasiados intentos fallidos. Cuenta bloqueada por 30 segundos.');
+                }
+                
                 throw new Error('Credenciales inválidas');
             }
+
+            // Login exitoso - resetear intentos fallidos
+            await this.resetFailedAttempts(email);
 
             // Retornar usuario sin contraseña
             delete user.password;
@@ -213,6 +232,93 @@ class User {
     static isValidEmail(email) {
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         return emailRegex.test(email);
+    }
+
+    // Verificar si el usuario está bloqueado
+    static async isUserLocked(email) {
+        try {
+            const sql = 'SELECT failed_attempts, locked_until FROM users WHERE email = ?';
+            const user = await database.get(sql, [email]);
+            
+            if (!user) {
+                return false;
+            }
+
+            // Si no hay bloqueo, retornar false
+            if (!user.locked_until) {
+                return false;
+            }
+
+            const now = Date.now();
+            const lockedUntil = parseInt(user.locked_until);
+
+            // Si el tiempo de bloqueo ya pasó, resetear intentos
+            if (now >= lockedUntil) {
+                await this.resetFailedAttempts(email);
+                return false;
+            }
+
+            // Usuario todavía bloqueado
+            return true;
+        } catch (error) {
+            throw new Error(`Error al verificar bloqueo: ${error.message}`);
+        }
+    }
+
+    // Incrementar intentos fallidos
+    static async incrementFailedAttempts(email) {
+        try {
+            // Calcular timestamp de bloqueo (30 segundos desde ahora)
+            const lockUntilTimestamp = Date.now() + (30 * 1000);
+            
+            const sql = `
+                UPDATE users 
+                SET failed_attempts = failed_attempts + 1,
+                    locked_until = CASE 
+                        WHEN failed_attempts + 1 >= 3 
+                        THEN ?
+                        ELSE locked_until 
+                    END
+                WHERE email = ?
+            `;
+            await database.run(sql, [lockUntilTimestamp, email]);
+        } catch (error) {
+            throw new Error(`Error al incrementar intentos fallidos: ${error.message}`);
+        }
+    }
+
+    // Resetear intentos fallidos
+    static async resetFailedAttempts(email) {
+        try {
+            const sql = `
+                UPDATE users 
+                SET failed_attempts = 0, locked_until = NULL
+                WHERE email = ?
+            `;
+            await database.run(sql, [email]);
+        } catch (error) {
+            throw new Error(`Error al resetear intentos: ${error.message}`);
+        }
+    }
+
+    // Obtener segundos restantes de bloqueo
+    static async getRemainingLockTime(email) {
+        try {
+            const sql = 'SELECT locked_until FROM users WHERE email = ?';
+            const user = await database.get(sql, [email]);
+            
+            if (!user || !user.locked_until) {
+                return 0;
+            }
+
+            const now = Date.now();
+            const lockedUntil = parseInt(user.locked_until);
+            const remainingMs = lockedUntil - now;
+            
+            return remainingMs > 0 ? Math.ceil(remainingMs / 1000) : 0;
+        } catch (error) {
+            throw new Error(`Error al obtener tiempo de bloqueo: ${error.message}`);
+        }
     }
 
     // Método de instancia para obtener datos seguros del usuario

@@ -40,6 +40,8 @@ class Database {
                     name TEXT NOT NULL,
                     email TEXT UNIQUE NOT NULL,
                     password TEXT NOT NULL,
+                    failed_attempts INTEGER DEFAULT 0,
+                    locked_until DATETIME DEFAULT NULL,
                     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
                     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
                 )
@@ -121,8 +123,76 @@ class Database {
                         return;
                     }
                     console.log('✅ Tablas de base de datos creadas/verificadas exitosamente');
-                    resolve();
+                    
+                    // Migración: Agregar columnas de bloqueo si no existen
+                    this.migrateUsersTable()
+                        .then(() => resolve())
+                        .catch(reject);
                 });
+            });
+        });
+    }
+
+    async migrateUsersTable() {
+        return new Promise((resolve, reject) => {
+            // Verificar si las columnas ya existen
+            this.db.all("PRAGMA table_info(users)", (err, columns) => {
+                if (err) {
+                    console.error('Error verificando estructura de users:', err.message);
+                    reject(err);
+                    return;
+                }
+
+                const hasFailedAttempts = columns.some(col => col.name === 'failed_attempts');
+                const hasLockedUntil = columns.some(col => col.name === 'locked_until');
+
+                const migrations = [];
+
+                if (!hasFailedAttempts) {
+                    migrations.push(
+                        new Promise((res, rej) => {
+                            this.db.run(
+                                'ALTER TABLE users ADD COLUMN failed_attempts INTEGER DEFAULT 0',
+                                (err) => {
+                                    if (err) {
+                                        console.error('Error agregando failed_attempts:', err.message);
+                                        rej(err);
+                                    } else {
+                                        console.log('✅ Columna failed_attempts agregada');
+                                        res();
+                                    }
+                                }
+                            );
+                        })
+                    );
+                }
+
+                if (!hasLockedUntil) {
+                    migrations.push(
+                        new Promise((res, rej) => {
+                            this.db.run(
+                                'ALTER TABLE users ADD COLUMN locked_until DATETIME DEFAULT NULL',
+                                (err) => {
+                                    if (err) {
+                                        console.error('Error agregando locked_until:', err.message);
+                                        rej(err);
+                                    } else {
+                                        console.log('✅ Columna locked_until agregada');
+                                        res();
+                                    }
+                                }
+                            );
+                        })
+                    );
+                }
+
+                if (migrations.length > 0) {
+                    Promise.all(migrations)
+                        .then(() => resolve())
+                        .catch(reject);
+                } else {
+                    resolve();
+                }
             });
         });
     }
