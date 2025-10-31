@@ -248,6 +248,12 @@ function displayResults(data) {
     
     // Scroll suave a resultados
     resultsSection.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    
+    // Cargar historial después del análisis
+    console.log('📊 Cargando historial después del análisis...');
+    setTimeout(() => {
+        loadHistoryAfterAnalysis();
+    }, 500);
 }
 
 // Obtener emoji según emoción
@@ -414,9 +420,149 @@ function handleLogout() {
     showUnauthenticatedUI();
     resetForm();
     
+    // Ocultar historial
+    const historySection = document.getElementById('historySection');
+    if (historySection) {
+        historySection.style.display = 'none';
+    }
+    
     if (typeof window.showSuccessModal === 'function') {
         window.showSuccessModal('👋 Sesión cerrada exitosamente');
     }
 }
 
+// ===== FUNCIONALIDAD DE HISTORIAL INTEGRADO =====
+
+// Cargar historial después de un análisis exitoso
+function loadHistoryAfterAnalysis() {
+    console.log('📊 Mostrando sección de historial...');
+    const token = localStorage.getItem('mindcare_token');
+    
+    if (!token) {
+        console.log('⚠️ No hay token, no se puede cargar historial');
+        return;
+    }
+    
+    // Mostrar sección de historial
+    const historySection = document.getElementById('historySection');
+    if (historySection) {
+        historySection.style.display = 'block';
+    }
+    
+    // Cargar datos
+    loadHistoryData();
+}
+
+// Cargar datos del historial desde la API
+async function loadHistoryData() {
+    console.log('🔍 Solicitando historial de emociones...');
+    
+    const historyLoading = document.getElementById('historyLoading');
+    const historyEntries = document.getElementById('historyEntries');
+    
+    // Mostrar estado de carga
+    if (historyLoading) historyLoading.style.display = 'block';
+    if (historyEntries) historyEntries.style.display = 'none';
+    
+    try {
+        const token = localStorage.getItem('mindcare_token');
+        const response = await fetch(`${API_BASE_URL}/emotions/history`, {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            }
+        });
+        
+        console.log('📡 Respuesta del servidor:', response.status);
+        
+        if (!response.ok) {
+            throw new Error(`Error ${response.status}: ${response.statusText}`);
+        }
+        
+        const result = await response.json();
+        console.log('✅ Datos recibidos:', result);
+        
+        if (historyLoading) historyLoading.style.display = 'none';
+        
+        // El endpoint devuelve { success: true, data: { entries: [...], stats: [...] } }
+        const entries = result.data?.entries || result.data;
+        
+        if (result.success && entries && entries.length > 0) {
+            console.log(`📝 Mostrando ${entries.length} entradas`);
+            displayHistoryEntries(entries);
+        } else {
+            console.log('📝 No hay entradas en el historial');
+            if (historyEntries) {
+                historyEntries.innerHTML = '<p style="text-align: center; color: #718096; padding: 20px;">📝 Aún no tienes entradas en tu historial.</p>';
+                historyEntries.style.display = 'block';
+            }
+        }
+        
+    } catch (error) {
+        console.error('❌ Error al cargar historial:', error);
+        if (historyLoading) historyLoading.style.display = 'none';
+        if (historyEntries) {
+            historyEntries.innerHTML = `
+                <p style="text-align: center; color: #e53e3e; padding: 20px;">⚠️ Error al cargar el historial<br>${error.message}</p>
+            `;
+            historyEntries.style.display = 'block';
+        }
+    }
+}
+
+// Mostrar entradas del historial en el DOM
+function displayHistoryEntries(entries) {
+    console.log(`📝 Mostrando ${entries.length} entradas`);
+    
+    const historyEntries = document.getElementById('historyEntries');
+    if (!historyEntries) return;
+    
+    historyEntries.innerHTML = '';
+    historyEntries.style.display = 'grid';
+    
+    // Mostrar las últimas 5 entradas
+    const recentEntries = entries.slice(0, 5);
+    
+    recentEntries.forEach(entry => {
+        const entryElement = createHistoryEntry(entry);
+        historyEntries.appendChild(entryElement);
+    });
+    
+    console.log('✅ Entradas mostradas correctamente');
+}
+
+// Crear elemento HTML para una entrada del historial
+function createHistoryEntry(entry) {
+    const div = document.createElement('div');
+    div.className = 'history-entry';
+    
+    const emoji = getEmotionEmoji(entry.emotion);
+    const date = new Date(entry.created_at);
+    const formattedDate = date.toLocaleDateString('es-ES', {
+        day: '2-digit',
+        month: 'short',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+    });
+    
+    div.innerHTML = `
+        <div class="history-entry-header">
+            <div class="history-entry-emotion">
+                <span style="font-size: 1.5rem;">${emoji}</span>
+                <span>${entry.emotion}</span>
+            </div>
+            <span class="history-entry-date">${formattedDate}</span>
+        </div>
+        <div class="history-entry-text">"${entry.text}"</div>
+        <div class="history-entry-confidence">
+            Confianza: ${Math.round(entry.confidence)}%
+        </div>
+    `;
+    
+    return div;
+}
+
 console.log('✅ Script de aplicación cargado');
+

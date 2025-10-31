@@ -23,6 +23,7 @@
             <!-- Botón para usuarios autenticados -->
             <div id="logoutButton" class="logout-container" style="display: none;">
                 <span id="userWelcome" class="user-welcome"></span>
+                <a href="history.html" class="btn-history">📊 Ver Historial</a>
                 <button id="logoutBtn" class="btn-logout">Cerrar Sesión 👋</button>
             </div>
         </header>
@@ -80,6 +81,22 @@
                 <button id="newAnalysisBtn" class="btn-secondary">
                     ✨ Realizar nuevo análisis
                 </button>
+
+                <!-- Botón para ver historial -->
+                <button id="showHistoryBtn" class="btn-secondary" style="display: none; margin-top: 15px;">
+                    📊 Ver mi historial completo
+                </button>
+            </section>
+
+            <!-- Sección de Historial -->
+            <section class="history-section" id="historySection" style="display: none;">
+                <h2>📊 Tu Historial Emocional</h2>
+                <div id="historyContent">
+                    <div id="historyLoading" style="text-align: center; padding: 20px;">
+                        <p>Cargando...</p>
+                    </div>
+                    <div id="historyEntries"></div>
+                </div>
             </section>
         </main>
 

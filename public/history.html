@@ -151,7 +151,7 @@
         // Forzar recarga de scripts sin caché
         const timestamp = Date.now();
         const authScript = document.createElement('script');
-        authScript.src = 'auth.js?t=' + timestamp;
+        authScript.src = 'mindcare-auth.js?t=' + timestamp;
         document.body.appendChild(authScript);
         
         authScript.onload = function() {

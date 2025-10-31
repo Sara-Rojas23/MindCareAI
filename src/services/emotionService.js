@@ -130,66 +130,120 @@ Analiza cuidadosamente el contexto en español y responde SOLO el JSON, sin expl
         const lowerText = text.toLowerCase();
         
         const emotionKeywords = {
-            alegría: ['feliz', 'contento', 'alegre', 'bien', 'genial', 'excelente', 'fantástico', 'maravilloso', 'increíble', 'perfecto', 'bueno', 'exitoso', 'logré', 'conseguí', 'hermoso'],
-            tristeza: ['triste', 'deprimido', 'mal', 'horrible', 'terrible', 'llorar', 'dolor', 'pena', 'melancolía', 'desanimado', 'decaído', 'abatido', 'desalentado'],
-            enojo: ['enojado', 'furioso', 'molesto', 'irritado', 'rabioso', 'indignado', 'cabreado', 'enfadado', 'ira', 'rabia', 'frustrado'],
-            ansiedad: ['ansioso', 'nervioso', 'preocupado', 'inquieto', 'intranquilo', 'angustiado', 'tenso', 'agitado'],
-            estrés: ['estresado', 'agobiado', 'abrumado', 'presionado', 'sobrecargado', 'trabajo', 'entregas', 'tareas', 'pendientes', 'tiempo', 'urgente', 'mucho que hacer', 'no puedo', 'cansado', 'agotado', 'exhausto'],
-            calma: ['tranquilo', 'relajado', 'sereno', 'en paz', 'calmado', 'sosegado', 'apacible', 'equilibrado'],
-            miedo: ['miedo', 'temor', 'terror', 'pánico', 'asustado', 'atemorizado', 'espanto'],
-            nostalgia: ['nostalgia', 'añoro', 'extraño', 'recuerdo', 'pasado', 'antes', 'época']
+            alegría: ['feliz', 'contento', 'alegre', 'bien', 'genial', 'excelente', 'fantástico', 'maravilloso', 'increíble', 'perfecto', 'bueno', 'exitoso', 'logré', 'conseguí', 'hermoso', 'amor', 'amo', 'encanta', 'disfruto', 'divertido', 'sonrío', 'risa', 'dichoso', 'júbilo', 'eufórico'],
+            tristeza: ['triste', 'deprimido', 'mal', 'horrible', 'terrible', 'llorar', 'lloro', 'dolor', 'pena', 'melancolía', 'desanimado', 'decaído', 'abatido', 'desalentado', 'solo', 'soledad', 'vacío', 'desesperanza', 'perdido', 'angustia', 'sufriendo', 'sufro', 'lamento', 'desconsuelo', 'afligido', 'apesadumbrado'],
+            enojo: ['enojado', 'enojada', 'furioso', 'furiosa', 'molesto', 'molesta', 'irritado', 'irritada', 'rabioso', 'rabiosa', 'indignado', 'indignada', 'cabreado', 'cabreada', 'enfadado', 'enfadada', 'ira', 'rabia', 'frustrado', 'frustrada', 'odio', 'detesto', 'harto', 'harta', 'indigna', 'enfurecido', 'enfurecida', 'colérico', 'colérica', 'airado', 'airada', 'brava', 'bravo', 'me cae mal', 'no soporto', 'me molesta', 'estoy molesta', 'estoy molesto', 'estoy brava', 'estoy bravo'],
+            ansiedad: ['ansioso', 'nerviosa', 'nervioso', 'preocupado', 'preocupada', 'inquieto', 'inquieta', 'intranquilo', 'intranquila', 'angustiado', 'angustiada', 'tenso', 'tensa', 'agitado', 'agitada', 'pánico', 'miedo', 'temor', 'inseguro', 'insegura', 'dudas', 'incertidumbre', 'desasosiego', 'intranquilidad'],
+            estrés: ['estresado', 'estresada', 'agobiado', 'agobiada', 'abrumado', 'abrumada', 'presionado', 'presionada', 'sobrecargado', 'sobrecargada', 'trabajo', 'entregas', 'tareas', 'pendientes', 'tiempo', 'urgente', 'mucho que hacer', 'no puedo', 'cansado', 'cansada', 'agotado', 'agotada', 'exhausto', 'exhausta', 'ocupado', 'ocupada', 'carga', 'responsabilidades', 'fecha límite', 'deadline', 'colapsado', 'colapsada', 'saturado', 'saturada'],
+            calma: ['tranquilo', 'tranquila', 'relajado', 'relajada', 'sereno', 'serena', 'en paz', 'calmado', 'calmada', 'sosegado', 'sosegada', 'apacible', 'equilibrado', 'equilibrada', 'descansado', 'descansada', 'paz', 'quieto', 'quieta', 'plácido', 'plácida', 'pacífico', 'pacífica'],
+            disgusto: ['asco', 'repugna', 'repugnante', 'repulsión', 'desagradable', 'asqueroso', 'asquerosa', 'me repugna', 'me da asco', 'que asco', 'repugnancia'],
+            miedo: ['miedo', 'temor', 'terror', 'pánico', 'asustado', 'asustada', 'atemorizado', 'atemorizada', 'espanto', 'amenaza', 'peligro', 'aterrado', 'aterrada', 'espantado', 'espantada'],
+            nostalgia: ['nostalgia', 'añoro', 'extraño', 'extraña', 'recuerdo', 'pasado', 'antes', 'época', 'ayer', 'extrañar', 'remembranza']
         };
 
         let scores = {};
-        let totalMatches = 0;
+        let totalWeight = 0;
 
-        // Contar coincidencias para cada emoción con pesos diferentes
+        // Contar coincidencias para cada emoción con análisis inteligente
         Object.keys(emotionKeywords).forEach(emotion => {
             let emotionScore = 0;
+            let matches = 0;
             
             emotionKeywords[emotion].forEach(keyword => {
                 if (lowerText.includes(keyword)) {
-                    // Dar más peso a palabras más específicas
-                    let weight = keyword.length > 8 ? 25 : 20; // Palabras largas más específicas
+                    matches++;
+                    // Peso basado en especificidad de la palabra
+                    let weight = 15;
                     
-                    // Palabras clave de estrés tienen mayor peso
-                    if (emotion === 'estrés' && ['estresado', 'agobiado', 'abrumado', 'trabajo', 'entregas'].includes(keyword)) {
-                        weight = 30;
+                    if (keyword.length > 10) weight = 35; // Palabras muy específicas
+                    else if (keyword.length > 7) weight = 25; // Palabras específicas
+                    else if (keyword.length > 5) weight = 20; // Palabras comunes
+                    
+                    // Palabras de emociones negativas fuertes
+                    if (['angustia', 'sufriendo', 'desesperanza', 'llorar', 'lloro', 'dolor'].includes(keyword)) {
+                        weight = 40;
+                    }
+                    
+                    // Palabras de estrés específicas
+                    if (emotion === 'estrés' && ['estresado', 'estresada', 'agobiado', 'agobiada', 'abrumado', 'abrumada', 'exhausto', 'exhausta'].includes(keyword)) {
+                        weight = 35;
+                    }
+                    
+                    // Palabras de ENOJO específicas - PESO ALTO
+                    if (emotion === 'enojo' && ['molesta', 'molesto', 'brava', 'bravo', 'furioso', 'furiosa', 'enojado', 'enojada', 'irritado', 'irritada', 'estoy molesta', 'estoy molesto', 'estoy brava', 'estoy bravo'].includes(keyword)) {
+                        weight = 45;
                     }
                     
                     emotionScore += weight;
                 }
             });
             
-            // Normalizar para que no exceda 100
-            scores[emotion] = Math.min(emotionScore, 100);
-            if (emotionScore > 0) totalMatches++;
+            if (emotionScore > 0) {
+                scores[emotion] = emotionScore;
+                totalWeight += emotionScore;
+            }
         });
 
-        // Detectar combinaciones comunes en español
-        if (lowerText.includes('día estresante') || lowerText.includes('mucho trabajo')) {
-            scores.estrés = Math.max(scores.estrés || 0, 80);
+        // Detectar frases y contextos comunes en español
+        if (lowerText.includes('día estresante') || lowerText.includes('mucho trabajo') || lowerText.includes('demasiado trabajo')) {
+            scores.estrés = (scores.estrés || 0) + 50;
+            totalWeight += 50;
         }
         
-        if (lowerText.includes('me siento') && (lowerText.includes('bien') || lowerText.includes('feliz'))) {
-            scores.alegría = Math.max(scores.alegría || 0, 75);
+        if (lowerText.includes('muy triste') || lowerText.includes('tan triste') || lowerText.includes('me siento mal')) {
+            scores.tristeza = (scores.tristeza || 0) + 50;
+            totalWeight += 50;
+        }
+        
+        if (lowerText.includes('muy feliz') || lowerText.includes('me siento bien') || lowerText.includes('muy contento')) {
+            scores.alegría = (scores.alegría || 0) + 50;
+            totalWeight += 50;
+        }
+        
+        // Detectar molestia o enojo general - PRIORIDAD ALTA
+        if (lowerText.includes('estoy molesta') || lowerText.includes('estoy molesto') || 
+            lowerText.includes('estoy brava') || lowerText.includes('estoy bravo') ||
+            lowerText.includes('me molesta mucho') || lowerText.includes('muy molesta') || lowerText.includes('muy molesto')) {
+            scores.enojo = (scores.enojo || 0) + 60;
+            totalWeight += 60;
+        }
+        
+        // Detectar "no me gusta" en contexto de personas (puede ser disgusto o enojo)
+        if (lowerText.includes('no me gusta') && 
+            (lowerText.includes('persona') || lowerText.includes('alguien') || lowerText.includes('él') || lowerText.includes('ella') || 
+             lowerText.includes('actúa') || lowerText.includes('actua') || lowerText.includes('comporta') || lowerText.includes('como es'))) {
+            // Persona que no gusta = más enojo que disgusto
+            scores.enojo = (scores.enojo || 0) + 50;
+            scores.disgusto = (scores.disgusto || 0) + 30;
+            totalWeight += 80;
+        }
+        
+        // Detectar asco/repugnancia física (puro disgusto)
+        if (lowerText.includes('me da asco') || lowerText.includes('que asco') || lowerText.includes('repugna')) {
+            scores.disgusto = (scores.disgusto || 0) + 70;
+            totalWeight += 70;
         }
 
-        // Si no hay coincidencias, usar análisis contextual básico
-        if (totalMatches === 0) {
-            if (lowerText.includes('trabajo') || lowerText.includes('tarea')) {
-                scores = { estrés: 50, ansiedad: 30, calma: 20 };
-            } else {
-                scores = { calma: 60, alegría: 40 };
-            }
+        // Si no hay coincidencias, usar neutral con baja confianza
+        if (Object.keys(scores).length === 0) {
+            scores = { calma: 40, alegría: 30, tristeza: 30 };
+            totalWeight = 100;
         }
+
+        // Normalizar scores a porcentajes
+        Object.keys(scores).forEach(emotion => {
+            scores[emotion] = Math.round((scores[emotion] / totalWeight) * 100);
+        });
 
         // Encontrar emoción dominante
         const primaryEmotion = Object.keys(scores).reduce((a, b) => 
             scores[a] > scores[b] ? a : b
         );
 
-        const confidence = Math.min(scores[primaryEmotion] || 50, 100);
+        // Confianza basada en qué tan clara es la emoción dominante
+        const secondHighest = Object.values(scores).sort((a, b) => b - a)[1] || 0;
+        const dominance = scores[primaryEmotion] - secondHighest;
+        const confidence = Math.min(Math.max(50 + dominance, 60), 90);
 
         return {
             success: true,

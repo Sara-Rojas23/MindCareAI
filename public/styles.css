@@ -92,7 +92,7 @@ header p {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 10px;
+    gap: 12px;
     margin-top: 20px;
 }
 
@@ -100,6 +100,25 @@ header p {
     color: #4a5568;
     font-size: 1rem;
     font-weight: 500;
+}
+
+.btn-history {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    text-decoration: none;
+    padding: 10px 24px;
+    border-radius: 8px;
+    font-size: 0.95rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.2);
+    display: inline-block;
+}
+
+.btn-history:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(102, 126, 234, 0.3);
 }
 
 .btn-logout {
@@ -362,6 +381,71 @@ button:disabled {
 
 .btn-secondary:hover {
     box-shadow: 0 8px 25px rgba(79, 209, 199, 0.3);
+}
+
+/* Sección de Historial Integrada */
+.history-section {
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: 20px;
+    padding: 30px;
+    margin-top: 30px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+}
+
+.history-section h2 {
+    color: #4a5568;
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+#historyEntries {
+    display: grid;
+    gap: 15px;
+    margin-top: 20px;
+}
+
+.history-entry {
+    background: white;
+    border-radius: 15px;
+    padding: 20px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+    border-left: 4px solid #667eea;
+}
+
+.history-entry-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.history-entry-emotion {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: #4a5568;
+}
+
+.history-entry-date {
+    font-size: 0.85rem;
+    color: #a0aec0;
+}
+
+.history-entry-text {
+    color: #718096;
+    margin: 10px 0;
+    padding: 10px;
+    background: #f7fafc;
+    border-radius: 8px;
+    font-style: italic;
+}
+
+.history-entry-confidence {
+    font-size: 0.9rem;
+    color: #667eea;
+    font-weight: 600;
 }
 
 .primary-emotion {
