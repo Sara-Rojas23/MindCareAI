@@ -1,46 +1,100 @@
-# MindCare AI - Diario Emocional MVP
+# 🧠 MindCare AI - Diario Emocional Inteligente
 
-Un MVP (Producto Mínimo Viable) de una aplicación web de diario emocional que utiliza inteligencia artificial para analizar emociones y proporcionar recomendaciones personalizadas.
+Sistema web de análisis emocional con inteligencia artificial que ayuda a las personas a comprender y gestionar mejor sus emociones a través de un diario interactivo.
 
-## 🚀 Características
+## ✨ Características Principales
 
-- **Análisis de emociones con IA**: Utiliza OpenAI GPT-3.5 para detectar emociones en texto
-- **Análisis de respaldo**: Sistema fallback con palabras clave si la API no está disponible
-- **Recomendaciones personalizadas**: Consejos y actividades basados en la emoción detectada
-- **Interfaz moderna**: UI responsiva con animaciones y diseño atractivo
-- **Análisis en tiempo real**: Resultados inmediatos con porcentajes de confianza
+- 🎭 **Análisis de Emociones con IA**: Detección inteligente de emociones en español usando OpenAI GPT-3.5
+- 🔐 **Sistema de Autenticación**: Login y registro seguro con JWT y bcrypt
+- 💬 **Retroalimentación Personalizada**: Mensajes personalizados según la emoción detectada
+- 📊 **Visualización Interactiva**: Emojis animados y barras de progreso para mostrar resultados
+- 💾 **Historial de Emociones**: Guarda todas las entradas emocionales en SQLite
+- 🎨 **Interfaz Moderna**: Diseño responsivo con animaciones suaves
+- 🔄 **Sistema Fallback**: Análisis por palabras clave cuando la API no está disponible
 
-## 📁 Estructura del proyecto
+## 🎯 Emociones Detectadas
+
+El sistema reconoce y analiza las siguientes emociones en español:
+
+- 😊 Alegría
+- 😢 Tristeza  
+- 😠 Enojo
+- 😨 Miedo
+- 😲 Sorpresa
+- 😖 Disgusto
+- 😰 Ansiedad
+- 😓 Estrés
+- 😌 Calma
+- 🥺 Nostalgia
+
+## 📁 Estructura del Proyecto
 
 ```
 MindCareAI1/
 ├── src/
 │   ├── controllers/
-│   │   └── emotionController.js    # Lógica de control para emociones
+│   │   ├── authController.js       # Lógica de autenticación
+│   │   └── emotionController.js    # Lógica de análisis emocional
 │   ├── services/
-│   │   └── emotionService.js       # Servicio de análisis de IA
+│   │   └── emotionService.js       # Servicio de IA con OpenAI
+│   ├── middleware/
+│   │   └── auth.js                 # Middleware de autenticación JWT
+│   ├── models/
+│   │   ├── database.js             # Configuración de SQLite
+│   │   └── User.js                 # Modelo de usuario
 │   └── routes/
-│       └── emotion.js              # Rutas de la API
+│       ├── auth.js                 # Rutas de autenticación
+│       └── emotion.js              # Rutas de emociones
 ├── public/
 │   ├── index.html                  # Página principal
-│   ├── styles.css                  # Estilos CSS
-│   └── app.js                      # JavaScript del frontend
-├── server.js                       # Servidor Express
+│   ├── login.html                  # Página de inicio de sesión
+│   ├── register.html               # Página de registro
+│   ├── history.html                # Historial de emociones
+│   ├── styles.css                  # Estilos CSS globales
+│   ├── mindcare-auth.js            # Sistema de autenticación frontend
+│   └── app-clean.js                # Lógica de análisis frontend
+├── data/
+│   └── mindcare.db                 # Base de datos SQLite
+├── server.js                       # Servidor Express principal
 ├── package.json                    # Dependencias del proyecto
 ├── .env.example                    # Variables de entorno (ejemplo)
-├── .gitignore                      # Archivos a ignorar en git
+├── .gitignore                      # Archivos excluidos de Git
 └── README.md                       # Este archivo
 ```
 
-## 🛠️ Instalación y configuración
+## 🛠️ Tecnologías Utilizadas
 
-### 1. Instalar dependencias
+### Backend
+- **Node.js** - Entorno de ejecución
+- **Express.js** - Framework web
+- **SQLite3** - Base de datos
+- **OpenAI API** - Análisis de emociones con IA
+- **JWT** - Autenticación con tokens
+- **bcryptjs** - Hash de contraseñas
+- **express-validator** - Validación de datos
+
+### Frontend
+- **HTML5** - Estructura
+- **CSS3** - Estilos y animaciones
+- **JavaScript ES6+** - Lógica del cliente
+- **Fetch API** - Comunicación con el servidor
+
+## 🚀 Instalación y Configuración
+
+### 1. Clonar el repositorio
+
+```bash
+git clone https://github.com/TU_USUARIO/MindCareAI.git
+cd MindCareAI
+```
+
+### 2. Instalar dependencias
 
 ```bash
 npm install
 ```
 
-### 2. Configurar variables de entorno
+### 3. Configurar variables de entorno
 
 Copia el archivo de ejemplo y configura tu API key de OpenAI:
 
@@ -48,22 +102,105 @@ Copia el archivo de ejemplo y configura tu API key de OpenAI:
 cp .env.example .env
 ```
 
-Edita el archivo `.env` y agrega tu API key de OpenAI:
+Edita el archivo `.env` y configura las variables:
 
 ```env
 OPENAI_API_KEY=tu_api_key_de_openai_aqui
 PORT=3000
 NODE_ENV=development
+JWT_SECRET=tu_secreto_jwt_aqui
 ```
 
-### 3. Obtener una API Key de OpenAI
+### 4. Iniciar el servidor
 
-1. Ve a [OpenAI API](https://platform.openai.com/api-keys)
-2. Crea una cuenta o inicia sesión
-3. Genera una nueva API key
-4. Copia la key al archivo `.env`
+```bash
+npm start
+```
 
-**Nota**: Si no tienes API key, la aplicación funcionará con el sistema de análisis de respaldo basado en palabras clave.
+El servidor estará disponible en: `http://localhost:3000`
+
+## 📝 Uso de la Aplicación
+
+### 1. Registro de Usuario
+- Navega a la página de registro
+- Completa el formulario con tu nombre, email y contraseña
+- Haz clic en "Registrarse"
+
+### 2. Iniciar Sesión
+- Ingresa tu email y contraseña
+- El sistema te redirigirá a la página principal
+
+### 3. Analizar Emociones
+- Escribe sobre cómo te sientes (mínimo 10 caracteres)
+- Haz clic en "Analizar Emoción"
+- Verás:
+  - 😊 Emoji animado de la emoción detectada
+  - Nombre de la emoción en español
+  - Barra de progreso con nivel de confianza
+  - Retroalimentación personalizada
+
+### 4. Ver Historial
+- Todas tus entradas se guardan automáticamente
+- Accede al historial para ver tu progreso emocional
+
+## 🔑 API Endpoints
+
+### Autenticación
+
+```http
+POST /api/auth/register
+Content-Type: application/json
+
+{
+  "name": "Tu Nombre",
+  "email": "tu@email.com",
+  "password": "tuPassword123"
+}
+```
+
+```http
+POST /api/auth/login
+Content-Type: application/json
+
+{
+  "email": "tu@email.com",
+  "password": "tuPassword123"
+}
+```
+
+### Análisis de Emociones
+
+```http
+POST /api/emotions/analyze
+Authorization: Bearer <tu_token_jwt>
+Content-Type: application/json
+
+{
+  "text": "Hoy me siento muy feliz porque logré terminar mi proyecto"
+}
+```
+
+```http
+GET /api/emotions/history
+Authorization: Bearer <tu_token_jwt>
+```
+
+## 🎨 Características de la Interfaz
+
+- ✅ **Responsive Design**: Funciona en móviles, tablets y escritorio
+- ✅ **Animaciones Suaves**: Transiciones fluidas entre estados
+- ✅ **Emojis Animados**: Emoji con animación bounceIn al aparecer
+- ✅ **Barra de Progreso**: Animación de llenado para mostrar confianza
+- ✅ **Feedback Visual**: Colores y mensajes según la emoción
+- ✅ **Gestión de Sesión**: Botones dinámicos según estado de autenticación
+
+## 🔒 Seguridad
+
+- 🔐 Contraseñas hasheadas con bcrypt (10 rounds)
+- 🎫 Autenticación con JWT (JSON Web Tokens)
+- 🛡️ Validación de datos con express-validator
+- 🔒 Middleware de autenticación para rutas protegidas
+- 🚫 Protección contra inyección SQL (prepared statements)
 
 ## 🚀 Ejecutar la aplicación
 
@@ -133,63 +270,139 @@ Si la API de OpenAI no está disponible, el sistema utiliza un análisis basado 
 - Calcula porcentajes basados en coincidencias
 - Proporciona un análisis básico pero funcional
 
-## 🚧 Funcionalidades futuras (Roadmap)
+## 🚧 Roadmap - Próximas Funcionalidades
 
-- [ ] Sistema de autenticación de usuarios
-- [ ] Base de datos para historial de emociones
-- [ ] Visualización de datos con gráficas
-- [ ] Seguimiento de hábitos diarios
-- [ ] Exportar datos para profesionales
+- [ ] Gráficas de tendencias emocionales
+- [ ] Exportar historial en PDF/CSV
 - [ ] Notificaciones y recordatorios
-- [ ] Análisis de tendencias emocionales
+- [ ] Temas oscuro/claro
+- [ ] Integración con calendarios
+- [ ] Análisis de patrones emocionales
+- [ ] Recomendaciones de profesionales
 
-## 🛡️ Seguridad y privacidad
+## 📊 Base de Datos
 
-- No se almacenan datos personales en esta versión MVP
-- Las consultas a la API son temporales
-- Manejo de errores seguro
-- Validación de entrada de datos
+### Tabla Users
+```sql
+- id: INTEGER PRIMARY KEY
+- name: TEXT NOT NULL
+- email: TEXT UNIQUE NOT NULL  
+- password: TEXT NOT NULL (hasheada)
+- created_at: DATETIME DEFAULT CURRENT_TIMESTAMP
+```
 
-## 📱 Compatibilidad
+### Tabla emotion_entries
+```sql
+- id: INTEGER PRIMARY KEY
+- user_id: INTEGER (FK a users)
+- text: TEXT NOT NULL
+- emotion: TEXT NOT NULL
+- confidence: REAL NOT NULL
+- created_at: DATETIME DEFAULT CURRENT_TIMESTAMP
+```
 
-- ✅ Chrome, Firefox, Safari, Edge
-- ✅ Dispositivos móviles y tablets
-- ✅ Diseño responsivo
+## � Solución de Problemas
 
-## 🤝 Contribuir
+### La aplicación no carga
+```bash
+# Verifica que el servidor esté corriendo
+npm start
 
-Este es un MVP en desarrollo. Las contribuciones son bienvenidas:
+# Revisa el puerto
+netstat -ano | findstr :3000
+```
 
-1. Fork el proyecto
-2. Crea una rama para tu feature
-3. Commit tus cambios
-4. Push a la rama
-5. Abre un Pull Request
+### Error de autenticación
+- Asegúrate de que `JWT_SECRET` esté configurado en `.env`
+- Verifica que la contraseña tenga al menos 6 caracteres
+- Limpia el localStorage del navegador
+
+### Error con OpenAI API
+- Verifica que tu API key sea válida
+- Revisa que tengas créditos en tu cuenta de OpenAI
+- La app funcionará con análisis de respaldo si no hay API key
+
+### Base de datos corrupta
+```bash
+# Elimina y recrea la base de datos
+rm data/mindcare.db
+npm start
+```
+
+## 📚 Documentación Técnica
+
+### Arquitectura
+```
+Cliente (Browser) <-> Express.js <-> SQLite
+                          |
+                          v
+                    OpenAI API
+```
+
+### Flujo de Autenticación
+1. Usuario se registra/inicia sesión
+2. Servidor valida credenciales
+3. Genera token JWT
+4. Cliente almacena token en localStorage
+5. Token se envía en headers para rutas protegidas
+
+### Flujo de Análisis
+1. Usuario escribe texto
+2. Frontend envía POST a `/api/emotions/analyze`
+3. Backend procesa con OpenAI o fallback
+4. Respuesta normalizada al frontend
+5. Frontend muestra resultados con animaciones
+
+## 🤝 Contribuciones
+
+¡Las contribuciones son bienvenidas! 
+
+### Cómo contribuir
+1. 🍴 Fork el proyecto
+2. 🌿 Crea una rama (`git checkout -b feature/NuevaCaracteristica`)
+3. 💾 Commit tus cambios (`git commit -m 'Agregar nueva característica'`)
+4. 📤 Push a la rama (`git push origin feature/NuevaCaracteristica`)
+5. 🔃 Abre un Pull Request
+
+### Código de Conducta
+- Sé respetuoso con otros colaboradores
+- Escribe código limpio y documentado
+- Prueba tus cambios antes de hacer PR
 
 ## 📄 Licencia
 
-ISC License - ver archivo LICENSE para detalles
+Este proyecto está bajo la Licencia ISC - ver el archivo LICENSE para más detalles.
 
-## 🆘 Solución de problemas
+## 👨‍💻 Autor
 
-### Error: "API Key no configurada"
-- Asegúrate de tener un archivo `.env` con `OPENAI_API_KEY`
-- Verifica que la API key sea válida
+Desarrollado con ❤️ para ayudar a las personas a comprender y gestionar mejor sus emociones.
 
-### Error: "No se pudo conectar con el servidor"
-- Verifica que el servidor esté ejecutándose en el puerto correcto
-- Revisa que no haya conflictos de puertos
+## 🙏 Agradecimientos
 
-### El análisis no funciona
-- La aplicación funcionará con el sistema de respaldo
-- Revisa la consola del navegador para más detalles
-
-## 📞 Contacto
-
-Desarrollado como MVP para demostrar capacidades de análisis emocional con IA.
+- OpenAI por su increíble API
+- Comunidad de Node.js
+- Todos los que contribuyan al proyecto
 
 ---
 
-**Versión**: 1.0.0  
-**Estado**: MVP - Producto Mínimo Viable  
-**Tecnologías**: Node.js, Express, OpenAI API, HTML5, CSS3, JavaScript ES6
+**📌 Estado del Proyecto**: ✅ Funcional y en Producción  
+**📅 Última Actualización**: Octubre 2025  
+**🔖 Versión**: 1.0.0  
+**⚡ Stack**: Node.js + Express + SQLite + OpenAI + JWT
+
+---
+
+### 💡 ¿Necesitas ayuda?
+
+Si encuentras algún problema o tienes preguntas:
+1. Revisa la sección de Solución de Problemas
+2. Busca en los Issues existentes
+3. Crea un nuevo Issue con detalles
+
+### ⭐ ¿Te gusta el proyecto?
+
+¡Dale una estrella en GitHub! ⭐
+
+---
+
+**Made with 🧠 and 💻 | MindCare AI © 2025**
