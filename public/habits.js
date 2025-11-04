@@ -1,21 +1,26 @@
 // habits.js - Lógica del frontend para el módulo de hábitos
 
 const API_URL = 'http://localhost:3000/api';
-const TOKEN_KEY = 'mindcare_token';
-const USER_KEY = 'mindcare_user';
 let currentEditingHabitId = null;
 
 // ==========================================
 // UTILIDADES DE AUTENTICACIÓN
 // ==========================================
+// Nota: TOKEN_KEY y USER_KEY ya están definidas en mindcare-auth.js
 
 function getAuthToken() {
-    return localStorage.getItem(TOKEN_KEY);
+    const TOKEN_KEY = 'mindcare_token';
+    const token = localStorage.getItem(TOKEN_KEY);
+    console.log('🔑 Token obtenido:', token ? `${token.substring(0, 20)}...` : 'null');
+    return token;
 }
 
 function getCurrentUser() {
+    const USER_KEY = 'mindcare_user';
     const userStr = localStorage.getItem(USER_KEY);
-    return userStr ? JSON.parse(userStr) : null;
+    const user = userStr ? JSON.parse(userStr) : null;
+    console.log('👤 Usuario obtenido:', user ? user.name : 'null');
+    return user;
 }
 
 function checkAuth() {
@@ -28,6 +33,7 @@ function checkAuth() {
         return null;
     }
     
+    console.log('✅ Autenticación verificada');
     return user;
 }
 
@@ -496,6 +502,8 @@ function showNotification(message, type = 'info') {
 
 async function handleLogout() {
     if (confirm('¿Estás seguro de que quieres cerrar sesión?')) {
+        const TOKEN_KEY = 'mindcare_token';
+        const USER_KEY = 'mindcare_user';
         localStorage.removeItem(TOKEN_KEY);
         localStorage.removeItem(USER_KEY);
         window.location.href = 'login.html';
