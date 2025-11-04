@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mis Hábitos - MindCare AI</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header>
+            <h1>🎯 Mis Hábitos Diarios</h1>
+            <p>Construye rutinas saludables para mejorar tu bienestar</p>
+            
+            <div class="logout-container">
+                <span id="userWelcome" class="user-welcome"></span>
+                <a href="index.html" class="btn-history" style="text-decoration: none;">🧠 Diario Emocional</a>
+                <a href="history.html" class="btn-history" style="text-decoration: none;">📊 Ver Historial</a>
+                <a href="backup.html" class="btn-history" style="text-decoration: none;">💾 Backups</a>
+                <button id="logoutBtn" class="btn-logout">Cerrar Sesión 👋</button>
+            </div>
+        </header>
+
+        <main>
+            <!-- Estadísticas del día -->
+            <section class="habits-stats">
+                <div class="stat-card">
+                    <div class="stat-icon">✅</div>
+                    <div class="stat-content">
+                        <div class="stat-value" id="completedToday">0</div>
+                        <div class="stat-label">Completados hoy</div>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">🎯</div>
+                    <div class="stat-content">
+                        <div class="stat-value" id="activeHabits">0</div>
+                        <div class="stat-label">Hábitos activos</div>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">🔥</div>
+                    <div class="stat-content">
+                        <div class="stat-value" id="bestStreak">0</div>
+                        <div class="stat-label">Mejor racha</div>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">📈</div>
+                    <div class="stat-content">
+                        <div class="stat-value" id="percentageToday">0%</div>
+                        <div class="stat-label">Progreso de hoy</div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Botón para agregar hábito -->
+            <section class="add-habit-section">
+                <button id="addHabitBtn" class="btn-add-habit">
+                    <span class="btn-icon">➕</span>
+                    <span class="btn-text">Agregar nuevo hábito</span>
+                </button>
+            </section>
+
+            <!-- Lista de hábitos -->
+            <section class="habits-list-section">
+                <h2>📋 Hábitos de hoy</h2>
+                <div id="habitsList" class="habits-list">
+                    <!-- Aquí se cargarán los hábitos dinámicamente -->
+                    <div class="loading-message">
+                        <div class="loading-spinner"></div>
+                        <p>Cargando hábitos...</p>
+                    </div>
+                </div>
+
+                <div id="emptyState" class="empty-state" style="display: none;">
+                    <div class="empty-icon">🌱</div>
+                    <h3>¡Comienza tu viaje de bienestar!</h3>
+                    <p>Aún no tienes hábitos registrados. Crea tu primer hábito para comenzar a construir una rutina saludable.</p>
+                    <button class="btn-primary" onclick="document.getElementById('addHabitBtn').click()">
+                        Crear mi primer hábito
+                    </button>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Modal para crear/editar hábito -->
+    <div id="habitModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modalTitle">Crear nuevo hábito</h2>
+                <button class="modal-close" id="closeModal">&times;</button>
+            </div>
+            
+            <form id="habitForm" class="habit-form">
+                <div class="form-group">
+                    <label for="habitName">
+                        <span class="label-text">Nombre del hábito</span>
+                        <span class="label-required">*</span>
+                    </label>
+                    <input 
+                        type="text" 
+                        id="habitName" 
+                        placeholder="Ej: Meditar 10 minutos"
+                        maxlength="100"
+                        required
+                    >
+                </div>
+
+                <div class="form-group">
+                    <label for="habitDescription">
+                        <span class="label-text">Descripción</span>
+                        <span class="label-optional">(opcional)</span>
+                    </label>
+                    <textarea 
+                        id="habitDescription" 
+                        placeholder="Ej: Meditación guiada por las mañanas"
+                        rows="3"
+                        maxlength="200"
+                    ></textarea>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="habitCategory">
+                            <span class="label-text">Categoría</span>
+                            <span class="label-required">*</span>
+                        </label>
+                        <select id="habitCategory" required>
+                            <option value="mental">🧘‍♀️ Bienestar Mental</option>
+                            <option value="fisico">💪 Actividad Física</option>
+                            <option value="descanso">😴 Descanso</option>
+                            <option value="nutricion">🍎 Nutrición</option>
+                            <option value="personal">📚 Crecimiento Personal</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="habitFrequency">
+                            <span class="label-text">Frecuencia</span>
+                            <span class="label-required">*</span>
+                        </label>
+                        <select id="habitFrequency" required>
+                            <option value="diaria">📅 Diaria</option>
+                            <option value="semanal">📆 Semanal</option>
+                            <option value="personalizada">⚙️ Personalizada</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="habitIcon">
+                            <span class="label-text">Ícono</span>
+                        </label>
+                        <input 
+                            type="text" 
+                            id="habitIcon" 
+                            placeholder="⭐"
+                            maxlength="2"
+                            value="⭐"
+                        >
+                        <small class="form-hint">Usa un emoji para personalizar tu hábito</small>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="habitColor">
+                            <span class="label-text">Color</span>
+                        </label>
+                        <div class="color-picker">
+                            <input 
+                                type="color" 
+                                id="habitColor" 
+                                value="#6366f1"
+                            >
+                            <span id="colorValue">#6366f1</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-actions">
+                    <button type="button" class="btn-secondary" id="cancelBtn">
+                        Cancelar
+                    </button>
+                    <button type="submit" class="btn-primary" id="saveHabitBtn">
+                        <span class="btn-text">Guardar hábito</span>
+                        <div class="loading-spinner" style="display: none;"></div>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="shared-utils.js"></script>
+    <script src="mindcare-auth.js"></script>
+    <script src="habits.js"></script>
+</body>
+</html>
