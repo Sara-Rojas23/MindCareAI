@@ -63,14 +63,22 @@ class Database {
                 )
             `;
 
-            // Tabla de hábitos (para futura implementación)
+            // Tabla de hábitos
             const createHabitsTable = `
                 CREATE TABLE IF NOT EXISTS habits (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
                     user_id INTEGER NOT NULL,
                     name TEXT NOT NULL,
                     description TEXT,
+                    category TEXT DEFAULT 'personal',
+                    frequency TEXT DEFAULT 'diaria',
+                    icon TEXT DEFAULT '⭐',
+                    color TEXT DEFAULT '#6366f1',
+                    is_active BOOLEAN DEFAULT 1,
+                    streak INTEGER DEFAULT 0,
+                    best_streak INTEGER DEFAULT 0,
                     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+                    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
                     FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE
                 )
             `;
@@ -83,6 +91,8 @@ class Database {
                     habit_id INTEGER NOT NULL,
                     completed BOOLEAN DEFAULT FALSE,
                     date DATE NOT NULL,
+                    completion_time TIME,
+                    mood_after TEXT,
                     notes TEXT,
                     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
                     FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE,
@@ -126,6 +136,8 @@ class Database {
                     
                     // Migración: Agregar columnas de bloqueo si no existen
                     this.migrateUsersTable()
+                        .then(() => this.migrateHabitsTable())
+                        .then(() => this.migrateHabitEntriesTable())
                         .then(() => resolve())
                         .catch(reject);
                 });
@@ -185,6 +197,122 @@ class Database {
                         })
                     );
                 }
+
+                if (migrations.length > 0) {
+                    Promise.all(migrations)
+                        .then(() => resolve())
+                        .catch(reject);
+                } else {
+                    resolve();
+                }
+            });
+        });
+    }
+
+    async migrateHabitsTable() {
+        return new Promise((resolve, reject) => {
+            // Verificar si las columnas ya existen
+            this.db.all("PRAGMA table_info(habits)", (err, columns) => {
+                if (err) {
+                    console.error('Error verificando estructura de habits:', err.message);
+                    reject(err);
+                    return;
+                }
+
+                // Si la tabla no existe o está vacía, no hacer nada
+                if (!columns || columns.length === 0) {
+                    resolve();
+                    return;
+                }
+
+                const existingColumns = columns.map(col => col.name);
+                const migrations = [];
+
+                // Definir columnas a agregar
+                const columnsToAdd = [
+                    { name: 'category', sql: 'ALTER TABLE habits ADD COLUMN category TEXT DEFAULT \'personal\'' },
+                    { name: 'frequency', sql: 'ALTER TABLE habits ADD COLUMN frequency TEXT DEFAULT \'diaria\'' },
+                    { name: 'icon', sql: 'ALTER TABLE habits ADD COLUMN icon TEXT DEFAULT \'⭐\'' },
+                    { name: 'color', sql: 'ALTER TABLE habits ADD COLUMN color TEXT DEFAULT \'#6366f1\'' },
+                    { name: 'is_active', sql: 'ALTER TABLE habits ADD COLUMN is_active BOOLEAN DEFAULT 1' },
+                    { name: 'streak', sql: 'ALTER TABLE habits ADD COLUMN streak INTEGER DEFAULT 0' },
+                    { name: 'best_streak', sql: 'ALTER TABLE habits ADD COLUMN best_streak INTEGER DEFAULT 0' },
+                    { name: 'updated_at', sql: 'ALTER TABLE habits ADD COLUMN updated_at DATETIME DEFAULT CURRENT_TIMESTAMP' }
+                ];
+
+                // Verificar qué columnas faltan y agregar migraciones
+                columnsToAdd.forEach(column => {
+                    if (!existingColumns.includes(column.name)) {
+                        migrations.push(
+                            new Promise((res, rej) => {
+                                this.db.run(column.sql, (err) => {
+                                    if (err) {
+                                        console.error(`Error agregando ${column.name} a habits:`, err.message);
+                                        rej(err);
+                                    } else {
+                                        console.log(`✅ Columna ${column.name} agregada a habits`);
+                                        res();
+                                    }
+                                });
+                            })
+                        );
+                    }
+                });
+
+                if (migrations.length > 0) {
+                    Promise.all(migrations)
+                        .then(() => resolve())
+                        .catch(reject);
+                } else {
+                    resolve();
+                }
+            });
+        });
+    }
+
+    async migrateHabitEntriesTable() {
+        return new Promise((resolve, reject) => {
+            // Verificar si las columnas ya existen
+            this.db.all("PRAGMA table_info(habit_entries)", (err, columns) => {
+                if (err) {
+                    console.error('Error verificando estructura de habit_entries:', err.message);
+                    reject(err);
+                    return;
+                }
+
+                // Si la tabla no existe o está vacía, no hacer nada
+                if (!columns || columns.length === 0) {
+                    resolve();
+                    return;
+                }
+
+                const existingColumns = columns.map(col => col.name);
+                const migrations = [];
+
+                // Definir columnas a agregar
+                const columnsToAdd = [
+                    { name: 'completion_time', sql: 'ALTER TABLE habit_entries ADD COLUMN completion_time TIME' },
+                    { name: 'mood_after', sql: 'ALTER TABLE habit_entries ADD COLUMN mood_after TEXT' }
+                ];
+
+                // Verificar qué columnas faltan y agregar migraciones
+                columnsToAdd.forEach(column => {
+                    if (!existingColumns.includes(column.name)) {
+                        migrations.push(
+                            new Promise((res, rej) => {
+                                this.db.run(column.sql, (err) => {
+                                    if (err) {
+                                        console.error(`Error agregando ${column.name} a habit_entries:`, err.message);
+                                        rej(err);
+                                    } else {
+                                        console.log(`✅ Columna ${column.name} agregada a habit_entries`);
+                                        res();
+                                    }
+                                });
+                            })
+                        );
+                    }
+                });
 
                 if (migrations.length > 0) {
                     Promise.all(migrations)
