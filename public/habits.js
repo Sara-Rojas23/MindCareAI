@@ -1,7 +1,35 @@
 // habits.js - Lógica del frontend para el módulo de hábitos
 
 const API_URL = 'http://localhost:3000/api';
+const TOKEN_KEY = 'mindcare_token';
+const USER_KEY = 'mindcare_user';
 let currentEditingHabitId = null;
+
+// ==========================================
+// UTILIDADES DE AUTENTICACIÓN
+// ==========================================
+
+function getAuthToken() {
+    return localStorage.getItem(TOKEN_KEY);
+}
+
+function getCurrentUser() {
+    const userStr = localStorage.getItem(USER_KEY);
+    return userStr ? JSON.parse(userStr) : null;
+}
+
+function checkAuth() {
+    const token = getAuthToken();
+    const user = getCurrentUser();
+    
+    if (!token || !user) {
+        console.log('❌ No hay token o usuario, redirigiendo a login');
+        window.location.href = 'login.html';
+        return null;
+    }
+    
+    return user;
+}
 
 // ==========================================
 // INICIALIZACIÓN
@@ -11,9 +39,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     console.log('🎯 Módulo de hábitos iniciado');
 
     // Verificar autenticación
-    const user = await checkAuth();
+    const user = checkAuth();
     if (!user) {
-        window.location.href = 'login.html';
         return;
     }
 
@@ -104,7 +131,7 @@ async function loadHabitsData() {
 
 async function loadStats() {
     try {
-        const token = localStorage.getItem('token');
+        const token = getAuthToken();
         const response = await fetch(`${API_URL}/habits/stats`, {
             headers: {
                 'Authorization': `Bearer ${token}`
@@ -128,7 +155,7 @@ async function loadStats() {
 
 async function loadTodayHabits() {
     try {
-        const token = localStorage.getItem('token');
+        const token = getAuthToken();
         const response = await fetch(`${API_URL}/habits/today`, {
             headers: {
                 'Authorization': `Bearer ${token}`
@@ -269,7 +296,7 @@ async function openEditHabitModal(habitId) {
         currentEditingHabitId = habitId;
         document.getElementById('modalTitle').textContent = 'Editar hábito';
 
-        const token = localStorage.getItem('token');
+        const token = getAuthToken();
         const response = await fetch(`${API_URL}/habits/${habitId}`, {
             headers: {
                 'Authorization': `Bearer ${token}`
@@ -330,7 +357,7 @@ async function handleSaveHabit(e) {
             color: document.getElementById('habitColor').value
         };
 
-        const token = localStorage.getItem('token');
+        const token = getAuthToken();
         const url = currentEditingHabitId 
             ? `${API_URL}/habits/${currentEditingHabitId}`
             : `${API_URL}/habits`;
@@ -375,7 +402,7 @@ async function handleSaveHabit(e) {
 
 async function handleToggleHabit(habitId, isCompleted) {
     try {
-        const token = localStorage.getItem('token');
+        const token = getAuthToken();
         const endpoint = isCompleted ? 'complete' : 'uncomplete';
 
         const response = await fetch(`${API_URL}/habits/${habitId}/${endpoint}`, {
@@ -421,7 +448,7 @@ async function handleDeleteHabit(habitId, habitName) {
     }
 
     try {
-        const token = localStorage.getItem('token');
+        const token = getAuthToken();
         const response = await fetch(`${API_URL}/habits/${habitId}`, {
             method: 'DELETE',
             headers: {
@@ -469,8 +496,8 @@ function showNotification(message, type = 'info') {
 
 async function handleLogout() {
     if (confirm('¿Estás seguro de que quieres cerrar sesión?')) {
-        localStorage.removeItem('token');
-        localStorage.removeItem('user');
+        localStorage.removeItem(TOKEN_KEY);
+        localStorage.removeItem(USER_KEY);
         window.location.href = 'login.html';
     }
 }
