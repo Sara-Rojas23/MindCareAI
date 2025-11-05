@@ -188,7 +188,7 @@ async function analyzeEmotion(text) {
         const analysisData = {
             emotion: data.data?.analysis?.primaryEmotion || 'calma',
             confidence: data.data?.analysis?.confidence || 60,
-            feedback: data.data?.analysis?.context || 'Análisis completado'
+            personalizedRecommendation: data.data?.analysis?.personalizedRecommendation || null
         };
         
         displayResults(analysisData);
@@ -221,9 +221,8 @@ function displayResults(data) {
     const emotionEmoji = document.getElementById('emotionEmoji');
     const confidenceValue = document.getElementById('confidenceValue');
     const confidenceFill = document.querySelector('.confidence-fill');
-    const feedbackText = document.getElementById('feedbackText');
     
-    if (!emotionName || !emotionEmoji || !confidenceValue || !confidenceFill || !feedbackText) {
+    if (!emotionName || !emotionEmoji || !confidenceValue || !confidenceFill) {
         console.error('❌ Elementos de resultados no encontrados');
         return;
     }
@@ -248,8 +247,10 @@ function displayResults(data) {
         confidenceFill.style.background = 'linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%)';
     }
     
-    // Retroalimentación
-    feedbackText.textContent = data.feedback || generateFeedback(data.emotion, confidence);
+    // Mostrar recomendaciones personalizadas si existen
+    if (data.personalizedRecommendation) {
+        displayPersonalizedRecommendations(data.personalizedRecommendation);
+    }
     
     // Mostrar sección de resultados con animación
     resultsSection.classList.add('show');
@@ -262,6 +263,78 @@ function displayResults(data) {
     setTimeout(() => {
         loadHistoryAfterAnalysis();
     }, 500);
+}
+
+// Mostrar recomendaciones personalizadas con hábitos sugeridos
+function displayPersonalizedRecommendations(recommendation) {
+    // Buscar o crear contenedor para recomendaciones
+    let recommendationsContainer = document.getElementById('recommendationsContainer');
+    
+    if (!recommendationsContainer) {
+        // Crear contenedor después de la tarjeta de emoción
+        const emotionCard = document.querySelector('.emotion-card');
+        if (emotionCard) {
+            recommendationsContainer = document.createElement('div');
+            recommendationsContainer.id = 'recommendationsContainer';
+            recommendationsContainer.className = 'recommendations-container';
+            emotionCard.parentNode.insertBefore(recommendationsContainer, emotionCard.nextSibling);
+        } else {
+            console.error('❌ No se encontró el contenedor de emoción');
+            return;
+        }
+    }
+    
+    // Limpiar contenedor
+    recommendationsContainer.innerHTML = '';
+    
+    // Crear HTML para recomendaciones
+    const recommendationsHTML = `
+        <div class="personalized-recommendations">
+            <h3 class="recommendations-title">💡 Recomendaciones Personalizadas</h3>
+            <p class="recommendations-message">${recommendation.message}</p>
+            
+            <div class="habits-suggestions">
+                <h4 class="habits-title">🎯 Hábitos Sugeridos para Ti:</h4>
+                <div class="habits-grid">
+                    ${recommendation.habitSuggestions.map(habit => `
+                        <div class="habit-suggestion-card">
+                            <div class="habit-suggestion-header">
+                                <span class="habit-suggestion-name">${habit.name}</span>
+                                <span class="habit-category-badge ${habit.category}">${getCategoryEmoji(habit.category)}</span>
+                            </div>
+                            <p class="habit-suggestion-description">${habit.description}</p>
+                        </div>
+                    `).join('')}
+                </div>
+                <div class="habits-call-to-action">
+                    <p>${recommendation.callToAction}</p>
+                    <a href="habits.html" class="btn-go-to-habits">
+                        <span>✨ Ir a Hábitos Diarios</span>
+                        <span class="arrow">→</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    recommendationsContainer.innerHTML = recommendationsHTML;
+    
+    // Animar entrada
+    setTimeout(() => {
+        recommendationsContainer.classList.add('show');
+    }, 100);
+}
+
+// Obtener emoji según categoría
+function getCategoryEmoji(category) {
+    const categoryEmojis = {
+        'mental': '🧠',
+        'fisico': '💪',
+        'descanso': '😴',
+        'nutricion': '🥗',
+        'personal': '⭐'
+    };
+    return categoryEmojis[category] || '⭐';
 }
 
 // Nota: getEmotionEmoji() ahora está en shared-utils.js
