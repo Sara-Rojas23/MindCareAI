@@ -1481,6 +1481,14 @@ footer {
    ESTILOS DEL MÓDULO DE HÁBITOS
    ========================================== */
 
+/* Header de hábitos - botones horizontales */
+.habits-page header .logout-container {
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 15px;
+}
+
 /* Estadísticas */
 .habits-stats {
     display: grid;
@@ -1536,7 +1544,7 @@ footer {
 .btn-add-habit {
     width: 100%;
     padding: 18px 24px;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
     color: white;
     border: none;
     border-radius: 15px;
@@ -1547,13 +1555,14 @@ footer {
     align-items: center;
     justify-content: center;
     gap: 10px;
-    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+    box-shadow: 0 4px 12px rgba(72, 187, 120, 0.4);
     transition: all 0.3s;
 }
 
 .btn-add-habit:hover {
     transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(102, 126, 234, 0.5);
+    box-shadow: 0 6px 20px rgba(72, 187, 120, 0.5);
+    background: linear-gradient(135deg, #38a169 0%, #2f855a 100%);
 }
 
 .btn-add-habit .btn-icon {
