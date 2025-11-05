@@ -221,7 +221,7 @@ function displayHabits(habits) {
 }
 
 function createHabitCard(habit) {
-    const streakDisplay = habit.racha > 0 ? `<span class="habit-streak">🔥 ${habit.racha} días</span>` : '';
+    // Ya no mostramos racha individual, solo racha global en las estadísticas
     
     return `
         <div class="habit-card" style="border-left: 4px solid ${habit.color}">
@@ -240,7 +240,6 @@ function createHabitCard(habit) {
                     <div class="habit-info">
                         <span class="habit-icon">${habit.icono}</span>
                         <span class="habit-name ${habit.completado ? 'completed' : ''}">${habit.nombre}</span>
-                        ${streakDisplay}
                     </div>
                     <div class="habit-actions">
                         <button class="habit-action-btn" id="edit-${habit.habitId}" title="Editar">

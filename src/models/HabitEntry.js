@@ -299,23 +299,32 @@ class HabitEntry {
             `;
 
             const entradas = await database.all(sql, [habitId]);
+            console.log(`📊 Calculando racha para hábito ${habitId}, entradas encontradas:`, entradas.length);
             
             let rachaActual = 0;
-            const hoy = new Date();
-            hoy.setHours(0, 0, 0, 0);
+            // Obtener fecha de hoy en formato YYYY-MM-DD
+            const hoy = new Date().toISOString().split('T')[0];
 
             // Verificar desde hoy hacia atrás
             for (let i = 0; i < entradas.length; i++) {
-                const fechaEntrada = new Date(entradas[i].date + 'T00:00:00');
-                const diasDiferencia = Math.floor((hoy - fechaEntrada) / (1000 * 60 * 60 * 24));
+                const fechaEntrada = entradas[i].date;
+                
+                // Calcular la fecha esperada para este día de la racha
+                const fechaEsperada = new Date();
+                fechaEsperada.setDate(fechaEsperada.getDate() - i);
+                const fechaEsperadaStr = fechaEsperada.toISOString().split('T')[0];
 
-                // Si la entrada es de hoy o del día que corresponde a la racha
-                if (diasDiferencia === i && entradas[i].completed === 1) {
+                console.log(`  Día ${i}: fecha=${fechaEntrada}, esperada=${fechaEsperadaStr}, completado=${entradas[i].completed}`);
+
+                // Si la entrada es del día esperado y está completada
+                if (fechaEntrada === fechaEsperadaStr && entradas[i].completed === 1) {
                     rachaActual++;
                 } else {
                     break; // Se rompió la racha
                 }
             }
+
+            console.log(`🔥 Racha calculada: ${rachaActual} días`);
 
             // Actualizar racha en la tabla habits
             await Habit.updateStreak(habitId, rachaActual);
@@ -377,6 +386,82 @@ class HabitEntry {
         }
     }
 
+    // Calcular racha global del usuario (días consecutivos completando TODOS los hábitos)
+    static async calculateUserStreak(userId) {
+        try {
+            // Obtener todos los hábitos activos del usuario
+            const habitos = await database.all(
+                `SELECT id FROM habits WHERE user_id = ? AND is_active = 1`,
+                [userId]
+            );
+
+            if (habitos.length === 0) {
+                return { rachaActual: 0, mejorRacha: 0 };
+            }
+
+            const habitIds = habitos.map(h => h.id);
+
+            // Obtener todas las fechas únicas donde hay entradas
+            const sql = `
+                SELECT DISTINCT date
+                FROM habit_entries
+                WHERE user_id = ? AND habit_id IN (${habitIds.join(',')})
+                ORDER BY date DESC
+            `;
+
+            const fechas = await database.all(sql, [userId]);
+
+            let rachaActual = 0;
+            const hoy = new Date().toISOString().split('T')[0];
+            let mejorRacha = 0;
+            let rachaTemp = 0;
+
+            // Verificar desde hoy hacia atrás
+            for (let i = 0; i < 365; i++) { // Revisar hasta 1 año atrás
+                const fecha = new Date();
+                fecha.setDate(fecha.getDate() - i);
+                const fechaStr = fecha.toISOString().split('T')[0];
+
+                // Contar cuántos hábitos se completaron ese día
+                const completados = await database.get(
+                    `SELECT COUNT(*) as total
+                    FROM habit_entries
+                    WHERE user_id = ? AND date = ? AND completed = 1 AND habit_id IN (${habitIds.join(',')})`,
+                    [userId, fechaStr]
+                );
+
+                // Verificar si todos los hábitos activos se completaron ese día
+                if (completados.total === habitIds.length) {
+                    rachaTemp++;
+                    if (i === 0) {
+                        rachaActual = rachaTemp; // Solo contar racha actual desde hoy
+                    }
+                    if (rachaTemp > mejorRacha) {
+                        mejorRacha = rachaTemp;
+                    }
+                } else {
+                    // Si no completó todos los hábitos ese día
+                    if (i === 0) {
+                        rachaActual = 0; // Hoy no completó todos
+                    }
+                    if (rachaTemp > 0) {
+                        rachaTemp = 0; // Reiniciar racha temporal
+                    }
+                    
+                    // Si llegamos a un día sin entradas y ya pasó más de 1 día, detenemos
+                    if (i > 0 && rachaActual === 0) {
+                        break;
+                    }
+                }
+            }
+
+            return { rachaActual, mejorRacha };
+
+        } catch (error) {
+            throw new Error(`Error al calcular racha del usuario: ${error.message}`);
+        }
+    }
+
     // Obtener estadísticas generales del usuario
     static async getUserStats(userId) {
         try {
@@ -393,13 +478,8 @@ class HabitEntry {
                 [userId, fechaHoy]
             );
 
-            // Mejor racha general
-            const mejorRacha = await database.get(
-                `SELECT MAX(best_streak) as mejor 
-                FROM habits 
-                WHERE user_id = ? AND is_active = 1`,
-                [userId]
-            );
+            // Calcular racha global del usuario
+            const { rachaActual, mejorRacha } = await this.calculateUserStreak(userId);
 
             // Total de completaciones este mes
             const primerDiaMes = new Date();
@@ -418,11 +498,13 @@ class HabitEntry {
                 ? Math.round((completadosHoy.total / totalHabitos) * 100)
                 : 0;
 
+            console.log(`📊 Stats para usuario ${userId}: activos=${totalHabitos}, completados=${completadosHoy.total}, racha=${rachaActual}, mejor=${mejorRacha}`);
+
             return {
                 habitosActivos: totalHabitos,
                 completadosHoy: completadosHoy.total,
                 porcentajeHoy: porcentajeHoy,
-                mejorRacha: mejorRacha.mejor || 0,
+                mejorRacha: rachaActual, // Ahora muestra la racha actual global
                 completadosEsteMes: completadosMes.total
             };
 
