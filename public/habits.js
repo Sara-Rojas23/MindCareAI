@@ -110,6 +110,19 @@ function setupEventListeners() {
         });
     }
 
+    // Selector de frecuencia - mostrar/ocultar días personalizados
+    const habitFrequency = document.getElementById('habitFrequency');
+    const customDaysSection = document.getElementById('customDaysSection');
+    if (habitFrequency && customDaysSection) {
+        habitFrequency.addEventListener('change', (e) => {
+            if (e.target.value === 'personalizada') {
+                customDaysSection.style.display = 'block';
+            } else {
+                customDaysSection.style.display = 'none';
+            }
+        });
+    }
+
     // Logout
     const logoutBtn = document.getElementById('logoutBtn');
     if (logoutBtn) {
@@ -293,6 +306,15 @@ function openCreateHabitModal() {
     document.getElementById('habitForm').reset();
     document.getElementById('habitColor').value = '#6366f1';
     document.getElementById('colorValue').textContent = '#6366f1';
+    
+    // Ocultar sección de días personalizados
+    document.getElementById('customDaysSection').style.display = 'none';
+    
+    // Desmarcar todos los checkboxes de días
+    document.querySelectorAll('input[name="customDays"]').forEach(checkbox => {
+        checkbox.checked = false;
+    });
+    
     document.getElementById('habitModal').style.display = 'block';
 }
 
@@ -320,6 +342,29 @@ async function openEditHabitModal(habitId) {
             document.getElementById('habitColor').value = habit.color;
             document.getElementById('colorValue').textContent = habit.color;
 
+            // Si es frecuencia personalizada, mostrar y marcar los días
+            if (habit.frequency === 'personalizada' && habit.custom_schedule) {
+                document.getElementById('customDaysSection').style.display = 'block';
+                
+                // Parsear los días guardados
+                const customDays = JSON.parse(habit.custom_schedule);
+                
+                // Desmarcar todos primero
+                document.querySelectorAll('input[name="customDays"]').forEach(checkbox => {
+                    checkbox.checked = false;
+                });
+                
+                // Marcar los días guardados
+                customDays.forEach(day => {
+                    const checkbox = document.querySelector(`input[name="customDays"][value="${day}"]`);
+                    if (checkbox) {
+                        checkbox.checked = true;
+                    }
+                });
+            } else {
+                document.getElementById('customDaysSection').style.display = 'none';
+            }
+
             document.getElementById('habitModal').style.display = 'block';
         } else {
             throw new Error(data.error);
@@ -334,6 +379,9 @@ async function openEditHabitModal(habitId) {
 function closeHabitModal() {
     document.getElementById('habitModal').style.display = 'none';
     currentEditingHabitId = null;
+    
+    // Ocultar sección de días personalizados al cerrar
+    document.getElementById('customDaysSection').style.display = 'none';
 }
 
 // ==========================================
@@ -361,6 +409,24 @@ async function handleSaveHabit(e) {
             icon: document.getElementById('habitIcon').value || '⭐',
             color: document.getElementById('habitColor').value
         };
+
+        // Si es frecuencia personalizada, obtener los días seleccionados
+        if (habitData.frequency === 'personalizada') {
+            const customDays = [];
+            const checkboxes = document.querySelectorAll('input[name="customDays"]:checked');
+            
+            if (checkboxes.length === 0) {
+                showNotification('Debes seleccionar al menos un día para la frecuencia personalizada', 'error');
+                return;
+            }
+            
+            checkboxes.forEach(checkbox => {
+                customDays.push(parseInt(checkbox.value));
+            });
+            
+            // Guardar como JSON en custom_schedule
+            habitData.custom_schedule = JSON.stringify(customDays);
+        }
 
         const token = getAuthToken();
         const url = currentEditingHabitId 

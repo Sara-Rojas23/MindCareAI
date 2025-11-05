@@ -77,6 +77,7 @@ class Database {
                     is_active BOOLEAN DEFAULT 1,
                     streak INTEGER DEFAULT 0,
                     best_streak INTEGER DEFAULT 0,
+                    custom_schedule TEXT DEFAULT NULL,
                     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
                     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
                     FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE
@@ -237,6 +238,7 @@ class Database {
                     { name: 'is_active', sql: 'ALTER TABLE habits ADD COLUMN is_active BOOLEAN DEFAULT 1' },
                     { name: 'streak', sql: 'ALTER TABLE habits ADD COLUMN streak INTEGER DEFAULT 0' },
                     { name: 'best_streak', sql: 'ALTER TABLE habits ADD COLUMN best_streak INTEGER DEFAULT 0' },
+                    { name: 'custom_schedule', sql: 'ALTER TABLE habits ADD COLUMN custom_schedule TEXT DEFAULT NULL' },
                     { name: 'updated_at', sql: 'ALTER TABLE habits ADD COLUMN updated_at DATETIME DEFAULT CURRENT_TIMESTAMP' }
                 ];
 

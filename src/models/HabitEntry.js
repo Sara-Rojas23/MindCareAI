@@ -136,6 +136,19 @@ class HabitEntry {
         try {
             const fechaHoy = new Date().toISOString().split('T')[0];
 
+            // Obtener solo los hábitos que deben mostrarse hoy
+            const habitosHoy = await Habit.findTodayHabits(userId);
+            
+            if (habitosHoy.length === 0) {
+                return [];
+            }
+
+            // Obtener IDs de los hábitos de hoy
+            const habitIds = habitosHoy.map(h => h.id);
+            
+            // Crear placeholders para la consulta SQL
+            const placeholders = habitIds.map(() => '?').join(',');
+
             const sql = `
                 SELECT 
                     h.id as habit_id,
@@ -145,6 +158,7 @@ class HabitEntry {
                     h.icon,
                     h.color,
                     h.frequency,
+                    h.custom_schedule,
                     h.streak,
                     he.id as entry_id,
                     he.completed,
@@ -153,11 +167,11 @@ class HabitEntry {
                     he.notes
                 FROM habits h
                 LEFT JOIN habit_entries he ON h.id = he.habit_id AND he.date = ?
-                WHERE h.user_id = ? AND h.is_active = 1
+                WHERE h.id IN (${placeholders}) AND h.is_active = 1
                 ORDER BY h.created_at ASC
             `;
 
-            const resultados = await database.all(sql, [fechaHoy, userId]);
+            const resultados = await database.all(sql, [fechaHoy, ...habitIds]);
 
             return resultados.map(r => ({
                 habitId: r.habit_id,
@@ -167,6 +181,7 @@ class HabitEntry {
                 icono: r.icon,
                 color: r.color,
                 frecuencia: r.frequency,
+                customSchedule: r.custom_schedule,
                 racha: r.streak,
                 entryId: r.entry_id,
                 completado: r.completed === 1,
@@ -389,9 +404,9 @@ class HabitEntry {
     // Calcular racha global del usuario (días consecutivos completando TODOS los hábitos)
     static async calculateUserStreak(userId) {
         try {
-            // Obtener todos los hábitos activos del usuario
+            // Obtener todos los hábitos activos del usuario con su configuración
             const habitos = await database.all(
-                `SELECT id FROM habits WHERE user_id = ? AND is_active = 1`,
+                `SELECT id, frequency, custom_schedule FROM habits WHERE user_id = ? AND is_active = 1`,
                 [userId]
             );
 
@@ -399,20 +414,7 @@ class HabitEntry {
                 return { rachaActual: 0, mejorRacha: 0 };
             }
 
-            const habitIds = habitos.map(h => h.id);
-
-            // Obtener todas las fechas únicas donde hay entradas
-            const sql = `
-                SELECT DISTINCT date
-                FROM habit_entries
-                WHERE user_id = ? AND habit_id IN (${habitIds.join(',')})
-                ORDER BY date DESC
-            `;
-
-            const fechas = await database.all(sql, [userId]);
-
             let rachaActual = 0;
-            const hoy = new Date().toISOString().split('T')[0];
             let mejorRacha = 0;
             let rachaTemp = 0;
 
@@ -421,20 +423,55 @@ class HabitEntry {
                 const fecha = new Date();
                 fecha.setDate(fecha.getDate() - i);
                 const fechaStr = fecha.toISOString().split('T')[0];
+                const diaSemana = fecha.getDay(); // 0=Domingo, 1=Lunes, ..., 6=Sábado
+
+                // Filtrar hábitos que debían mostrarse ese día específico
+                const habitosDelDia = habitos.filter(habit => {
+                    if (habit.frequency === 'diaria') {
+                        return true;
+                    }
+                    if (habit.frequency === 'semanal') {
+                        return true;
+                    }
+                    if (habit.frequency === 'personalizada' && habit.custom_schedule) {
+                        try {
+                            const customDays = JSON.parse(habit.custom_schedule);
+                            return customDays.includes(diaSemana);
+                        } catch (error) {
+                            return false;
+                        }
+                    }
+                    return false;
+                });
+
+                // Si no hay hábitos para ese día, cuenta como día completado
+                if (habitosDelDia.length === 0) {
+                    rachaTemp++;
+                    if (i === 0) {
+                        rachaActual = rachaTemp;
+                    }
+                    if (rachaTemp > mejorRacha) {
+                        mejorRacha = rachaTemp;
+                    }
+                    continue;
+                }
+
+                const habitIdsDelDia = habitosDelDia.map(h => h.id);
+                const placeholders = habitIdsDelDia.map(() => '?').join(',');
 
                 // Contar cuántos hábitos se completaron ese día
                 const completados = await database.get(
                     `SELECT COUNT(*) as total
                     FROM habit_entries
-                    WHERE user_id = ? AND date = ? AND completed = 1 AND habit_id IN (${habitIds.join(',')})`,
-                    [userId, fechaStr]
+                    WHERE user_id = ? AND date = ? AND completed = 1 AND habit_id IN (${placeholders})`,
+                    [userId, fechaStr, ...habitIdsDelDia]
                 );
 
-                // Verificar si todos los hábitos activos se completaron ese día
-                if (completados.total === habitIds.length) {
+                // Verificar si todos los hábitos del día se completaron
+                if (completados.total === habitIdsDelDia.length) {
                     rachaTemp++;
                     if (i === 0) {
-                        rachaActual = rachaTemp; // Solo contar racha actual desde hoy
+                        rachaActual = rachaTemp;
                     }
                     if (rachaTemp > mejorRacha) {
                         mejorRacha = rachaTemp;
@@ -448,7 +485,7 @@ class HabitEntry {
                         rachaTemp = 0; // Reiniciar racha temporal
                     }
                     
-                    // Si llegamos a un día sin entradas y ya pasó más de 1 día, detenemos
+                    // Si ya determinamos racha actual y está en 0, podemos detener
                     if (i > 0 && rachaActual === 0) {
                         break;
                     }
@@ -467,16 +504,23 @@ class HabitEntry {
         try {
             const fechaHoy = new Date().toISOString().split('T')[0];
 
-            // Total de hábitos activos
-            const totalHabitos = await Habit.countActiveHabits(userId);
+            // Total de hábitos que deben mostrarse hoy (según frecuencia y días)
+            const habitosHoy = await Habit.findTodayHabits(userId);
+            const totalHabitosHoy = habitosHoy.length;
 
-            // Hábitos completados hoy
-            const completadosHoy = await database.get(
-                `SELECT COUNT(*) as total 
-                FROM habit_entries 
-                WHERE user_id = ? AND date = ? AND completed = 1`,
-                [userId, fechaHoy]
-            );
+            // Hábitos completados hoy (solo de los que deben mostrarse hoy)
+            const habitIdsHoy = habitosHoy.map(h => h.id);
+            let completadosHoy = { total: 0 };
+            
+            if (habitIdsHoy.length > 0) {
+                const placeholders = habitIdsHoy.map(() => '?').join(',');
+                completadosHoy = await database.get(
+                    `SELECT COUNT(*) as total 
+                    FROM habit_entries 
+                    WHERE habit_id IN (${placeholders}) AND date = ? AND completed = 1`,
+                    [...habitIdsHoy, fechaHoy]
+                );
+            }
 
             // Calcular racha global del usuario
             const { rachaActual, mejorRacha } = await this.calculateUserStreak(userId);
@@ -493,15 +537,15 @@ class HabitEntry {
                 [userId, fechaInicio]
             );
 
-            // Calcular porcentaje de hoy
-            const porcentajeHoy = totalHabitos > 0 
-                ? Math.round((completadosHoy.total / totalHabitos) * 100)
+            // Calcular porcentaje de hoy (basado en hábitos que deben mostrarse hoy)
+            const porcentajeHoy = totalHabitosHoy > 0 
+                ? Math.round((completadosHoy.total / totalHabitosHoy) * 100)
                 : 0;
 
-            console.log(`📊 Stats para usuario ${userId}: activos=${totalHabitos}, completados=${completadosHoy.total}, racha=${rachaActual}, mejor=${mejorRacha}`);
+            console.log(`📊 Stats para usuario ${userId}: hoy=${totalHabitosHoy}, completados=${completadosHoy.total}, racha=${rachaActual}, mejor=${mejorRacha}`);
 
             return {
-                habitosActivos: totalHabitos,
+                habitosActivos: totalHabitosHoy, // Ahora muestra solo los de hoy
                 completadosHoy: completadosHoy.total,
                 porcentajeHoy: porcentajeHoy,
                 mejorRacha: rachaActual, // Ahora muestra la racha actual global

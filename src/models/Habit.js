@@ -13,6 +13,7 @@ class Habit {
         this.is_active = habitData.is_active;
         this.streak = habitData.streak;
         this.best_streak = habitData.best_streak;
+        this.custom_schedule = habitData.custom_schedule;
         this.created_at = habitData.created_at;
         this.updated_at = habitData.updated_at;
     }
@@ -43,7 +44,8 @@ class Habit {
                 category = this.CATEGORIES.PERSONAL,
                 frequency = this.FREQUENCIES.DIARIA,
                 icon = '⭐',
-                color = '#6366f1'
+                color = '#6366f1',
+                custom_schedule = null
             } = habitData;
 
             // Validaciones básicas
@@ -82,9 +84,9 @@ class Habit {
                 INSERT INTO habits (
                     user_id, name, description, category, 
                     frequency, icon, color, is_active, 
-                    streak, best_streak
+                    streak, best_streak, custom_schedule
                 )
-                VALUES (?, ?, ?, ?, ?, ?, ?, 1, 0, 0)
+                VALUES (?, ?, ?, ?, ?, ?, ?, 1, 0, 0, ?)
             `;
 
             const result = await database.run(sql, [
@@ -94,7 +96,8 @@ class Habit {
                 category,
                 frequency,
                 icon,
-                color
+                color,
+                custom_schedule
             ]);
 
             // Retornar el hábito creado
@@ -170,7 +173,8 @@ class Habit {
                 category, 
                 frequency, 
                 icon, 
-                color 
+                color,
+                custom_schedule
             } = habitData;
 
             // Validar solo los campos que se están actualizando
@@ -231,6 +235,10 @@ class Habit {
             if (color !== undefined) {
                 camposActualizar.push('color = ?');
                 valores.push(color);
+            }
+            if (custom_schedule !== undefined) {
+                camposActualizar.push('custom_schedule = ?');
+                valores.push(custom_schedule);
             }
 
             // Siempre actualizar updated_at
@@ -408,6 +416,49 @@ class Habit {
         }
     }
 
+    // Obtener hábitos que deben mostrarse hoy según frecuencia y custom_schedule
+    static async findTodayHabits(userId) {
+        try {
+            // Obtener todos los hábitos activos
+            const sql = 'SELECT * FROM habits WHERE user_id = ? AND is_active = 1 ORDER BY created_at DESC';
+            const habitos = await database.all(sql, [userId]);
+
+            // Obtener el día actual (0=Domingo, 1=Lunes, ..., 6=Sábado)
+            const today = new Date().getDay();
+
+            // Filtrar hábitos según frecuencia
+            const habitosHoy = habitos.filter(habit => {
+                // Si es diaria, siempre se muestra
+                if (habit.frequency === 'diaria') {
+                    return true;
+                }
+
+                // Si es semanal, se muestra todos los días (usuario decide cuándo completar)
+                if (habit.frequency === 'semanal') {
+                    return true;
+                }
+
+                // Si es personalizada, verificar si hoy está en los días seleccionados
+                if (habit.frequency === 'personalizada' && habit.custom_schedule) {
+                    try {
+                        const customDays = JSON.parse(habit.custom_schedule);
+                        return customDays.includes(today);
+                    } catch (error) {
+                        console.error('Error al parsear custom_schedule:', error);
+                        return false;
+                    }
+                }
+
+                return false;
+            });
+
+            return habitosHoy.map(h => new Habit(h));
+
+        } catch (error) {
+            throw new Error(`Error al obtener hábitos de hoy: ${error.message}`);
+        }
+    }
+
     // Método de instancia para obtener datos seguros del hábito
     toSafeObject() {
         return {
@@ -422,6 +473,7 @@ class Habit {
             is_active: this.is_active,
             streak: this.streak,
             best_streak: this.best_streak,
+            custom_schedule: this.custom_schedule,
             created_at: this.created_at,
             updated_at: this.updated_at
         };
