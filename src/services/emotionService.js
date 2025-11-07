@@ -175,9 +175,9 @@ Analiza cuidadosamente el contexto en español y responde SOLO el JSON, sin expl
         
         const emotionKeywords = {
             alegría: ['feliz', 'contento', 'alegre', 'bien', 'genial', 'excelente', 'fantástico', 'maravilloso', 'increíble', 'perfecto', 'bueno', 'exitoso', 'logré', 'conseguí', 'hermoso', 'amor', 'amo', 'encanta', 'disfruto', 'divertido', 'sonrío', 'risa', 'dichoso', 'júbilo', 'eufórico'],
-            tristeza: ['triste', 'deprimido', 'mal', 'horrible', 'terrible', 'llorar', 'lloro', 'dolor', 'pena', 'melancolía', 'desanimado', 'decaído', 'abatido', 'desalentado', 'solo', 'soledad', 'vacío', 'desesperanza', 'perdido', 'angustia', 'sufriendo', 'sufro', 'lamento', 'desconsuelo', 'afligido', 'apesadumbrado'],
+            tristeza: ['triste', 'deprimido', 'deprimida', 'depresivo', 'depresiva', 'depresión', 'mal', 'horrible', 'terrible', 'llorar', 'lloro', 'dolor', 'pena', 'melancolía', 'melancólico', 'melancólica', 'desanimado', 'desanimada', 'decaído', 'decaída', 'abatido', 'abatida', 'desalentado', 'desalentada', 'solo', 'sola', 'soledad', 'vacío', 'vacía', 'desesperanza', 'desesperanzado', 'desesperanzada', 'perdido', 'perdida', 'angustia', 'angustiado', 'angustiada', 'sufriendo', 'sufro', 'lamento', 'desconsuelo', 'afligido', 'afligida', 'apesadumbrado', 'apesadumbrada', 'desganado', 'desgana', 'sin ganas', 'sin ánimo', 'sin energía', 'sin fuerzas', 'miserable', 'devastado', 'devastada'],
             enojo: ['enojado', 'enojada', 'furioso', 'furiosa', 'molesto', 'molesta', 'irritado', 'irritada', 'rabioso', 'rabiosa', 'indignado', 'indignada', 'cabreado', 'cabreada', 'enfadado', 'enfadada', 'ira', 'rabia', 'frustrado', 'frustrada', 'odio', 'detesto', 'harto', 'harta', 'indigna', 'enfurecido', 'enfurecida', 'colérico', 'colérica', 'airado', 'airada', 'brava', 'bravo', 'me cae mal', 'no soporto', 'me molesta', 'estoy molesta', 'estoy molesto', 'estoy brava', 'estoy bravo'],
-            ansiedad: ['ansioso', 'nerviosa', 'nervioso', 'preocupado', 'preocupada', 'inquieto', 'inquieta', 'intranquilo', 'intranquila', 'angustiado', 'angustiada', 'tenso', 'tensa', 'agitado', 'agitada', 'pánico', 'miedo', 'temor', 'inseguro', 'insegura', 'dudas', 'incertidumbre', 'desasosiego', 'intranquilidad'],
+            ansiedad: ['ansioso', 'ansiosa', 'ansiedad', 'nerviosa', 'nervioso', 'preocupado', 'preocupada', 'inquieto', 'inquieta', 'intranquilo', 'intranquila', 'angustiado', 'angustiada', 'tenso', 'tensa', 'agitado', 'agitada', 'pánico', 'miedo', 'temor', 'inseguro', 'insegura', 'dudas', 'incertidumbre', 'desasosiego', 'intranquilidad'],
             estrés: ['estresado', 'estresada', 'agobiado', 'agobiada', 'abrumado', 'abrumada', 'presionado', 'presionada', 'sobrecargado', 'sobrecargada', 'trabajo', 'entregas', 'tareas', 'pendientes', 'tiempo', 'urgente', 'mucho que hacer', 'no puedo', 'cansado', 'cansada', 'agotado', 'agotada', 'exhausto', 'exhausta', 'ocupado', 'ocupada', 'carga', 'responsabilidades', 'fecha límite', 'deadline', 'colapsado', 'colapsada', 'saturado', 'saturada'],
             calma: ['tranquilo', 'tranquila', 'relajado', 'relajada', 'sereno', 'serena', 'en paz', 'calmado', 'calmada', 'sosegado', 'sosegada', 'apacible', 'equilibrado', 'equilibrada', 'descansado', 'descansada', 'paz', 'quieto', 'quieta', 'plácido', 'plácida', 'pacífico', 'pacífica'],
             disgusto: ['asco', 'repugna', 'repugnante', 'repulsión', 'desagradable', 'asqueroso', 'asquerosa', 'me repugna', 'me da asco', 'que asco', 'repugnancia'],
@@ -204,8 +204,8 @@ Analiza cuidadosamente el contexto en español y responde SOLO el JSON, sin expl
                     else if (keyword.length > 5) weight = 20; // Palabras comunes
                     
                     // Palabras de emociones negativas fuertes
-                    if (['angustia', 'sufriendo', 'desesperanza', 'llorar', 'lloro', 'dolor'].includes(keyword)) {
-                        weight = 40;
+                    if (['angustia', 'sufriendo', 'desesperanza', 'llorar', 'lloro', 'dolor', 'depresión', 'depresivo', 'depresiva', 'deprimido', 'deprimida', 'devastado', 'devastada', 'miserable', 'sin ganas', 'sin ánimo'].includes(keyword)) {
+                        weight = 50;
                     }
                     
                     // Palabras de estrés específicas
@@ -237,6 +237,24 @@ Analiza cuidadosamente el contexto en español y responde SOLO el JSON, sin expl
         if (lowerText.includes('muy triste') || lowerText.includes('tan triste') || lowerText.includes('me siento mal')) {
             scores.tristeza = (scores.tristeza || 0) + 50;
             totalWeight += 50;
+        }
+        
+        // Detectar depresión específicamente - PESO MUY ALTO
+        if (lowerText.includes('depresivo') || lowerText.includes('depresiva') || 
+            lowerText.includes('deprimido') || lowerText.includes('deprimida') ||
+            lowerText.includes('depresión') || lowerText.includes('me siento deprimido') || 
+            lowerText.includes('me siento deprimida') || lowerText.includes('estoy deprimido') ||
+            lowerText.includes('estoy deprimida')) {
+            scores.tristeza = (scores.tristeza || 0) + 80;
+            totalWeight += 80;
+        }
+        
+        // Detectar falta de energía/ganas (señal de depresión)
+        if (lowerText.includes('sin ganas') || lowerText.includes('sin ánimo') || 
+            lowerText.includes('sin energía') || lowerText.includes('sin fuerzas') ||
+            lowerText.includes('no tengo ganas') || lowerText.includes('no tengo ánimo')) {
+            scores.tristeza = (scores.tristeza || 0) + 60;
+            totalWeight += 60;
         }
         
         if (lowerText.includes('muy feliz') || lowerText.includes('me siento bien') || lowerText.includes('muy contento')) {
