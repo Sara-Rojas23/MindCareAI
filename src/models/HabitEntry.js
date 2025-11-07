@@ -548,7 +548,8 @@ class HabitEntry {
                 habitosActivos: totalHabitosHoy, // Ahora muestra solo los de hoy
                 completadosHoy: completadosHoy.total,
                 porcentajeHoy: porcentajeHoy,
-                mejorRacha: rachaActual, // Ahora muestra la racha actual global
+                rachaActual: rachaActual, // Racha actual global
+                mejorRacha: mejorRacha, // Mejor racha histórica global
                 completadosEsteMes: completadosMes.total
             };
 

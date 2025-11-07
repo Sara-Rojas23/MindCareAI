@@ -1217,3 +1217,285 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 });
+
+// ==========================================
+// SISTEMA DE PERFIL DE USUARIO
+// ==========================================
+
+// Definición de insignias (solo logros que tienen insignia como recompensa)
+const BADGES = [
+    {
+        id: 'ten_completions',
+        name: 'Principiante',
+        icon: '🎯',
+        achievementId: 'ten_completions'
+    },
+    {
+        id: 'thirty_completions',
+        name: 'Compromiso',
+        icon: '⭐',
+        achievementId: 'thirty_completions'
+    },
+    {
+        id: 'fifty_completions',
+        name: 'Perseverancia',
+        icon: '💪',
+        achievementId: 'fifty_completions'
+    },
+    {
+        id: 'hundred_completions',
+        name: 'Maestría',
+        icon: '👑',
+        achievementId: 'hundred_completions'
+    },
+    {
+        id: 'streak_3',
+        name: 'Consistencia',
+        icon: '🔥',
+        achievementId: 'streak_3'
+    },
+    {
+        id: 'streak_7',
+        name: 'Semana Perfecta',
+        icon: '🌟',
+        achievementId: 'streak_7'
+    },
+    {
+        id: 'streak_14',
+        name: 'Fortaleza',
+        icon: '🏆',
+        achievementId: 'streak_14'
+    },
+    {
+        id: 'streak_30',
+        name: 'Diamante',
+        icon: '💎',
+        achievementId: 'streak_30'
+    },
+    {
+        id: 'early_bird',
+        name: 'Madrugador',
+        icon: '🌅',
+        achievementId: 'early_bird'
+    },
+    {
+        id: 'night_owl',
+        name: 'Noctámbulo',
+        icon: '🦉',
+        achievementId: 'night_owl'
+    },
+    {
+        id: 'all_categories',
+        name: 'Explorador',
+        icon: '🗺️',
+        achievementId: 'all_categories'
+    },
+    {
+        id: 'comeback',
+        name: 'Resiliencia',
+        icon: '🔄',
+        achievementId: 'comeback'
+    }
+];
+
+// Abrir modal de perfil
+async function openProfileModal() {
+    const modal = document.getElementById('profileModal');
+    const content = document.getElementById('profileContent');
+
+    if (!modal || !content) {
+        console.error('❌ Modal de perfil no encontrado');
+        return;
+    }
+
+    modal.style.display = 'block';
+
+    try {
+        // Obtener información del usuario
+        const user = getCurrentUser();
+        
+        // Obtener estadísticas
+        const statsResponse = await fetch('/api/habits/stats', {
+            headers: {
+                'Authorization': `Bearer ${getAuthToken()}`
+            }
+        });
+
+        if (!statsResponse.ok) throw new Error('Error al cargar estadísticas');
+
+        const statsData = await statsResponse.json();
+        const stats = statsData.stats || {};
+
+        // Normalizar los nombres de las propiedades del backend
+        stats.currentStreak = stats.rachaActual || 0;
+        stats.bestStreak = stats.mejorRacha || 0;
+        stats.totalCompletado = stats.completadosEsteMes || 0;
+
+        // Enriquecer estadísticas para logros
+        await enrichStatsForAchievements(stats);
+
+        // Calcular logros desbloqueados
+        const unlockedAchievements = getUnlockedAchievements(stats);
+
+        // Mostrar perfil
+        displayProfile(user, stats, unlockedAchievements);
+
+    } catch (error) {
+        console.error('❌ Error al cargar perfil:', error);
+        content.innerHTML = `
+            <div class="error-message">
+                <p>❌ Error al cargar el perfil</p>
+                <button onclick="openProfileModal()" class="btn-primary">Reintentar</button>
+            </div>
+        `;
+    }
+}
+
+// Obtener logros desbloqueados
+function getUnlockedAchievements(stats) {
+    return ACHIEVEMENTS.filter(achievement => {
+        const current = achievement.checkProgress(stats);
+        return current >= achievement.target;
+    }).map(a => a.id);
+}
+
+// Mostrar perfil completo
+function displayProfile(user, stats, unlockedAchievements) {
+    const content = document.getElementById('profileContent');
+    
+    // Calcular insignias desbloqueadas
+    const unlockedBadges = BADGES.filter(badge => 
+        unlockedAchievements.includes(badge.achievementId)
+    );
+
+    const totalBadges = BADGES.length;
+    const unlockedCount = unlockedBadges.length;
+
+    // Formatear fecha de registro
+    // El backend devuelve 'created_at' no 'createdAt'
+    const registrationDate = user.created_at ? 
+        new Date(user.created_at).toLocaleDateString('es-ES', { 
+            year: 'numeric', 
+            month: 'long', 
+            day: 'numeric' 
+        }) : 
+        'Fecha no disponible';
+
+    let html = `
+        <div class="profile-header">
+            <div class="profile-avatar">
+                ${getAvatarEmoji(user.name || user.email)}
+            </div>
+            <h3 class="profile-name">${user.name || 'Usuario'}</h3>
+            <p class="profile-email">${user.email}</p>
+        </div>
+
+        <div class="profile-stats">
+            <div class="profile-stat-card">
+                <div class="profile-stat-icon">🎯</div>
+                <div class="profile-stat-value">${stats.totalHabits || 0}</div>
+                <div class="profile-stat-label">Hábitos Creados</div>
+            </div>
+            <div class="profile-stat-card">
+                <div class="profile-stat-icon">✅</div>
+                <div class="profile-stat-value">${stats.totalCompletado || 0}</div>
+                <div class="profile-stat-label">Completados</div>
+            </div>
+            <div class="profile-stat-card">
+                <div class="profile-stat-icon">🔥</div>
+                <div class="profile-stat-value">${stats.currentStreak || 0}</div>
+                <div class="profile-stat-label">Racha Actual</div>
+            </div>
+        </div>
+
+        <div class="profile-info-section">
+            <div class="profile-info-item">
+                <span class="profile-info-label">📅 Miembro desde</span>
+                <span class="profile-info-value">${registrationDate}</span>
+            </div>
+            <div class="profile-info-item">
+                <span class="profile-info-label">🏆 Insignias Desbloqueadas</span>
+                <span class="profile-info-value">${unlockedCount}/${totalBadges}</span>
+            </div>
+            <div class="profile-info-item">
+                <span class="profile-info-label">⭐ Mejor Racha</span>
+                <span class="profile-info-value">${stats.bestStreak || 0} días</span>
+            </div>
+        </div>
+
+        <div class="profile-section">
+            <h3 class="profile-section-title">
+                🏅 Mis Insignias
+            </h3>
+            ${unlockedCount === 0 ? `
+                <div class="empty-badges">
+                    <div class="empty-badges-icon">🏅</div>
+                    <p>Aún no has desbloqueado ninguna insignia</p>
+                    <p style="margin-top: 10px; font-size: 0.9rem;">¡Completa logros para obtener insignias!</p>
+                </div>
+            ` : `
+                <div class="badges-grid">
+                    ${BADGES.map(badge => createBadgeHTML(badge, unlockedAchievements)).join('')}
+                </div>
+            `}
+        </div>
+    `;
+
+    content.innerHTML = html;
+}
+
+// Crear HTML para una insignia
+function createBadgeHTML(badge, unlockedAchievements) {
+    const isUnlocked = unlockedAchievements.includes(badge.achievementId);
+    const statusClass = isUnlocked ? 'unlocked' : 'locked';
+    
+    return `
+        <div class="badge-item ${statusClass}">
+            <div class="badge-icon">${badge.icon}</div>
+            <h4 class="badge-name">${badge.name}</h4>
+            ${isUnlocked ? 
+                `<p class="badge-date">Desbloqueada</p>` :
+                `<p class="badge-locked-text">🔒 Bloqueada</p>`
+            }
+        </div>
+    `;
+}
+
+// Obtener emoji del avatar basado en el nombre
+function getAvatarEmoji(name) {
+    const emojis = ['👨', '👩', '🧑', '👤', '😊', '🙂', '😎', '🤗', '🌟', '⭐'];
+    const index = (name || '').length % emojis.length;
+    return emojis[index];
+}
+
+// Cerrar modal de perfil
+function closeProfileModal() {
+    const modal = document.getElementById('profileModal');
+    if (modal) {
+        modal.style.display = 'none';
+    }
+}
+
+// Event listeners para el modal de perfil
+document.addEventListener('DOMContentLoaded', () => {
+    const profileBtn = document.getElementById('profileBtn');
+    const closeProfileBtn = document.getElementById('closeProfileModal');
+    const profileModal = document.getElementById('profileModal');
+
+    if (profileBtn) {
+        profileBtn.addEventListener('click', openProfileModal);
+    }
+
+    if (closeProfileBtn) {
+        closeProfileBtn.addEventListener('click', closeProfileModal);
+    }
+
+    // Cerrar al hacer click fuera del modal
+    if (profileModal) {
+        profileModal.addEventListener('click', (e) => {
+            if (e.target === profileModal) {
+                closeProfileModal();
+            }
+        });
+    }
+});

@@ -7,7 +7,7 @@
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
     <title>Mis Hábitos - MindCare AI</title>
-    <link rel="stylesheet" href="styles.css?v=6.0">
+    <link rel="stylesheet" href="styles.css?v=7.1">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 </head>
 <body class="habits-page">
@@ -21,6 +21,7 @@
                 <span id="userWelcome" class="user-welcome"></span>
                 <a href="index.html" class="btn-history" style="text-decoration: none;">🧠 Diario Emocional</a>
                 <button id="achievementsBtn" class="btn-history">🏆 Logros</button>
+                <button id="profileBtn" class="btn-history">👤 Mi Perfil</button>
                 <a href="backup.html" class="btn-history" style="text-decoration: none;">💾 Backups</a>
                 <button id="logoutBtn" class="btn-logout">Cerrar Sesión 👋</button>
             </div>
@@ -270,9 +271,26 @@
         </div>
     </div>
 
+    <!-- Modal de Perfil -->
+    <div id="profileModal" class="modal">
+        <div class="modal-content profile-modal">
+            <div class="modal-header">
+                <h2>👤 Mi Perfil</h2>
+                <button class="modal-close" id="closeProfileModal">&times;</button>
+            </div>
+            
+            <div id="profileContent" class="profile-content">
+                <div class="loading-message">
+                    <div class="loading-spinner"></div>
+                    <p>Cargando perfil...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Scripts -->
     <script src="shared-utils.js?v=6.0"></script>
-    <script src="mindcare-auth.js?v=6.0"></script>
-    <script src="habits.js?v=6.0"></script>
+    <script src="mindcare-auth.js?v=7.1"></script>
+    <script src="habits.js?v=7.1"></script>
 </body>
 </html>
