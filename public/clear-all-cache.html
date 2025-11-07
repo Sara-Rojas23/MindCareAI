@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Limpiar Caché - MindCare AI</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 20px;
+            text-align: center;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .container {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+        }
+        h1 {
+            color: #333;
+            margin-bottom: 20px;
+        }
+        .step {
+            background: #f5f5f5;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 10px;
+            text-align: left;
+        }
+        .step strong {
+            color: #667eea;
+            font-size: 18px;
+        }
+        button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            font-size: 16px;
+            border-radius: 10px;
+            cursor: pointer;
+            margin: 10px;
+            font-weight: bold;
+        }
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+        .success {
+            color: #28a745;
+            font-weight: bold;
+            margin-top: 20px;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧹 Limpieza Completa de Caché</h1>
+        
+        <div class="step">
+            <strong>Paso 1:</strong> Haz clic en el botón de abajo para limpiar el caché del navegador
+        </div>
+        
+        <button onclick="clearAllCache()">🗑️ Limpiar Caché Completo</button>
+        
+        <div class="step">
+            <strong>Paso 2:</strong> Después de limpiar, presiona <strong>Ctrl + Shift + Delete</strong>
+        </div>
+        
+        <div class="step">
+            <strong>Paso 3:</strong> En la ventana que se abre:
+            <ul style="text-align: left; margin-top: 10px;">
+                <li>Selecciona "Todo el tiempo"</li>
+                <li>Marca "Imágenes y archivos en caché"</li>
+                <li>Haz clic en "Borrar datos"</li>
+            </ul>
+        </div>
+        
+        <button onclick="goToHabits()">✅ Ir a Mis Hábitos</button>
+        
+        <div class="success" id="successMsg">
+            ✅ Caché limpiado exitosamente!
+        </div>
+    </div>
+
+    <script>
+        async function clearAllCache() {
+            try {
+                // Limpiar localStorage
+                localStorage.clear();
+                
+                // Restaurar datos de autenticación si existen
+                const token = sessionStorage.getItem('mindcare_token');
+                const user = sessionStorage.getItem('mindcare_user');
+                if (token && user) {
+                    localStorage.setItem('mindcare_token', token);
+                    localStorage.setItem('mindcare_user', user);
+                }
+                
+                // Limpiar caché de Service Worker si existe
+                if ('caches' in window) {
+                    const cacheNames = await caches.keys();
+                    await Promise.all(
+                        cacheNames.map(cacheName => caches.delete(cacheName))
+                    );
+                }
+                
+                // Mostrar mensaje de éxito
+                document.getElementById('successMsg').style.display = 'block';
+                
+                alert('✅ Caché limpiado!\n\nAhora presiona Ctrl+Shift+Delete y sigue el Paso 3.');
+                
+            } catch (error) {
+                console.error('Error limpiando caché:', error);
+                alert('⚠️ Hubo un error. Por favor, presiona Ctrl+Shift+Delete manualmente.');
+            }
+        }
+        
+        function goToHabits() {
+            // Agregar timestamp para forzar recarga
+            window.location.href = 'habits.html?nocache=' + Date.now();
+        }
+    </script>
+</body>
+</html>

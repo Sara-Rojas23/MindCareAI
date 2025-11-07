@@ -296,15 +296,24 @@ function displayPersonalizedRecommendations(recommendation) {
             <div class="habits-suggestions">
                 <h4 class="habits-title">🎯 Hábitos Sugeridos para Ti:</h4>
                 <div class="habits-grid">
-                    ${recommendation.habitSuggestions.map(habit => `
-                        <div class="habit-suggestion-card">
+                    ${recommendation.habitSuggestions.map(habit => {
+                        const params = new URLSearchParams({
+                            name: habit.name,
+                            category: habit.category,
+                            description: habit.description
+                        });
+                        return `
+                        <a href="habits.html?create=true&${params.toString()}" class="habit-suggestion-card">
                             <div class="habit-suggestion-header">
                                 <span class="habit-suggestion-name">${habit.name}</span>
                                 <span class="habit-category-badge ${habit.category}">${getCategoryEmoji(habit.category)}</span>
                             </div>
                             <p class="habit-suggestion-description">${habit.description}</p>
-                        </div>
-                    `).join('')}
+                            <div class="habit-suggestion-action">
+                                <span class="create-habit-text">✨ Crear este hábito</span>
+                            </div>
+                        </a>
+                    `}).join('')}
                 </div>
                 <div class="habits-call-to-action">
                     <p>${recommendation.callToAction}</p>

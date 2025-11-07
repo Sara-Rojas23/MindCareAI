@@ -20,6 +20,7 @@
             <div class="logout-container">
                 <span id="userWelcome" class="user-welcome"></span>
                 <a href="index.html" class="btn-history" style="text-decoration: none;">🧠 Diario Emocional</a>
+                <button id="achievementsBtn" class="btn-history">🏆 Logros</button>
                 <a href="backup.html" class="btn-history" style="text-decoration: none;">💾 Backups</a>
                 <button id="logoutBtn" class="btn-logout">Cerrar Sesión 👋</button>
             </div>
@@ -247,6 +248,23 @@
                 <div class="loading-message">
                     <div class="loading-spinner"></div>
                     <p>Cargando progreso...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Logros -->
+    <div id="achievementsModal" class="modal">
+        <div class="modal-content achievements-modal">
+            <div class="modal-header">
+                <h2>🏆 Mis Logros</h2>
+                <button class="modal-close" id="closeAchievementsModal">&times;</button>
+            </div>
+            
+            <div id="achievementsContent" class="achievements-content">
+                <div class="loading-message">
+                    <div class="loading-spinner"></div>
+                    <p>Cargando logros...</p>
                 </div>
             </div>
         </div>

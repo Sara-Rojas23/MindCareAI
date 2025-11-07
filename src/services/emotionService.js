@@ -21,13 +21,21 @@ class EmotionAnalysisService {
     }
 
     async analyzeEmotion(text) {
+        console.log('\n🔍 ========== INICIANDO ANÁLISIS DE EMOCIÓN ==========');
+        console.log('📝 Texto recibido:', text);
+        console.log('🔑 API Key configurada:', this.apiKey ? '✅ SÍ (oculta)' : '❌ NO');
+        
         try {
             if (!this.apiKey) {
+                console.warn('⚠️ API Key de OpenAI no configurada, usando fallback');
                 throw new Error('API Key de OpenAI no configurada');
             }
 
+            console.log('🤖 Preparando solicitud a OpenAI...');
             const prompt = this.createAnalysisPrompt(text);
+            console.log('📋 Prompt generado (primeros 200 caracteres):', prompt.substring(0, 200) + '...');
             
+            console.log('🌐 Enviando solicitud a OpenAI API...');
             const response = await axios.post(
                 `${this.baseURL}/chat/completions`,
                 {
@@ -53,14 +61,38 @@ class EmotionAnalysisService {
                 }
             );
 
+            console.log('✅ Respuesta recibida de OpenAI');
+            console.log('📊 Contenido de la respuesta:', response.data.choices[0].message.content);
+
             const result = this.parseAIResponse(response.data.choices[0].message.content);
-            return this.validateAndFormatResult(result, text);
+            console.log('✅ JSON parseado correctamente:', JSON.stringify(result, null, 2));
+            
+            const finalResult = this.validateAndFormatResult(result, text);
+            console.log('✅ Resultado final formateado');
+            console.log('🎯 Emoción detectada:', finalResult.data.analysis.primaryEmotion);
+            console.log('📈 Confianza:', finalResult.data.analysis.confidence + '%');
+            console.log('🔍 ========== ANÁLISIS COMPLETADO ==========\n');
+            
+            return finalResult;
 
         } catch (error) {
-            console.error('Error en análisis de emociones:', error.message);
+            console.error('❌ ========== ERROR EN ANÁLISIS ==========');
+            console.error('❌ Tipo de error:', error.name);
+            console.error('❌ Mensaje:', error.message);
+            if (error.response) {
+                console.error('❌ Status HTTP:', error.response.status);
+                console.error('❌ Datos de error:', JSON.stringify(error.response.data, null, 2));
+            }
+            console.error('❌ Stack:', error.stack);
+            console.log('🔄 Usando análisis de fallback por palabras clave...');
             
             // Fallback: análisis básico por palabras clave
-            return this.fallbackAnalysis(text);
+            const fallbackResult = this.fallbackAnalysis(text);
+            console.log('✅ Fallback completado');
+            console.log('🎯 Emoción detectada (fallback):', fallbackResult.data.analysis.primaryEmotion);
+            console.log('🔍 ========== ANÁLISIS COMPLETADO (FALLBACK) ==========\n');
+            
+            return fallbackResult;
         }
     }
 
@@ -135,7 +167,11 @@ Analiza cuidadosamente el contexto en español y responde SOLO el JSON, sin expl
 
     // Análisis de respaldo usando palabras clave mejorado para español
     fallbackAnalysis(text) {
+        console.log('\n🔄 ========== INICIANDO ANÁLISIS FALLBACK ==========');
+        console.log('📝 Texto a analizar:', text);
+        
         const lowerText = text.toLowerCase();
+        console.log('📝 Texto en minúsculas:', lowerText);
         
         const emotionKeywords = {
             alegría: ['feliz', 'contento', 'alegre', 'bien', 'genial', 'excelente', 'fantástico', 'maravilloso', 'increíble', 'perfecto', 'bueno', 'exitoso', 'logré', 'conseguí', 'hermoso', 'amor', 'amo', 'encanta', 'disfruto', 'divertido', 'sonrío', 'risa', 'dichoso', 'júbilo', 'eufórico'],
