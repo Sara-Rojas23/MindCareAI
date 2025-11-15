@@ -166,20 +166,15 @@ class EmotionController {
         try {
             const sql = `
                 INSERT INTO emotion_entries (
-                    user_id, text, primary_emotion, confidence, 
-                    emotion_breakdown, context, analysis_method
-                ) VALUES (?, ?, ?, ?, ?, ?, ?)
+                    user_id, text, primary_emotion, confidence, analysis_method
+                ) VALUES (?, ?, ?, ?, ?)
             `;
-
-            const emotionBreakdownStr = JSON.stringify(analysis.emotionBreakdown);
 
             await database.run(sql, [
                 userId,
                 text,
                 analysis.primaryEmotion,
                 analysis.confidence,
-                emotionBreakdownStr,
-                analysis.context,
                 analysis.analysisMethod
             ]);
 
@@ -201,8 +196,7 @@ class EmotionController {
             const sql = `
                 SELECT 
                     id, text, primary_emotion, confidence, 
-                    emotion_breakdown, context, analysis_method,
-                    created_at
+                    analysis_method, created_at
                 FROM emotion_entries 
                 WHERE user_id = ?
                 ORDER BY created_at DESC
@@ -218,10 +212,7 @@ class EmotionController {
                 text: entry.text,
                 emotion: entry.primary_emotion,
                 confidence: entry.confidence,
-                emotion_breakdown: JSON.parse(entry.emotion_breakdown || '{}'),
-                context: entry.context,
                 analysis_method: entry.analysis_method,
-                recommendations: null, // TODO: agregar recomendaciones si las hay
                 created_at: entry.created_at
             }));
 

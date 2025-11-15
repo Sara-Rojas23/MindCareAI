@@ -10,9 +10,7 @@ class AuthController {
             body('name')
                 .trim()
                 .isLength({ min: 2, max: 50 })
-                .withMessage('El nombre debe tener entre 2 y 50 caracteres')
-                .matches(/^[a-zA-ZáéíóúüñÁÉÍÓÚÜÑ\s]+$/)
-                .withMessage('El nombre solo debe contener letras'),
+                .withMessage('El nombre debe tener entre 2 y 50 caracteres'),
             
             body('email')
                 .isEmail()
@@ -22,16 +20,6 @@ class AuthController {
             body('password')
                 .isLength({ min: 6, max: 100 })
                 .withMessage('La contraseña debe tener entre 6 y 100 caracteres')
-                .matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/)
-                .withMessage('La contraseña debe contener al menos una minúscula, una mayúscula y un número'),
-            
-            body('confirmPassword')
-                .custom((value, { req }) => {
-                    if (value !== req.body.password) {
-                        throw new Error('Las contraseñas no coinciden');
-                    }
-                    return true;
-                })
         ];
     }
 

@@ -1,0 +1,1393 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manual de Usuario - MindCare AI</title>
+    <style>
+        @page {
+            size: A4;
+            margin: 2cm;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: #fff;
+            padding: 20px;
+            max-width: 210mm;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            padding: 30px 0;
+            border-bottom: 3px solid #6366f1;
+            margin-bottom: 40px;
+        }
+
+        .header h1 {
+            color: #6366f1;
+            font-size: 36px;
+            margin-bottom: 10px;
+        }
+
+        .header .subtitle {
+            color: #666;
+            font-size: 18px;
+        }
+
+        .header .version {
+            color: #999;
+            font-size: 14px;
+            margin-top: 10px;
+        }
+
+        .toc {
+            background: #f8f9fa;
+            padding: 25px;
+            border-radius: 8px;
+            margin-bottom: 40px;
+            page-break-after: always;
+        }
+
+        .toc h2 {
+            color: #6366f1;
+            margin-bottom: 20px;
+            font-size: 24px;
+        }
+
+        .toc ol {
+            margin-left: 20px;
+        }
+
+        .toc li {
+            margin: 8px 0;
+            font-size: 16px;
+        }
+
+        .toc a {
+            color: #333;
+            text-decoration: none;
+        }
+
+        .toc a:hover {
+            color: #6366f1;
+            text-decoration: underline;
+        }
+
+        .section {
+            margin-bottom: 50px;
+            page-break-inside: avoid;
+        }
+
+        .section h2 {
+            color: #6366f1;
+            font-size: 28px;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #e5e7eb;
+        }
+
+        .section h3 {
+            color: #4f46e5;
+            font-size: 22px;
+            margin: 25px 0 15px 0;
+        }
+
+        .section h4 {
+            color: #6366f1;
+            font-size: 18px;
+            margin: 20px 0 10px 0;
+        }
+
+        .section p {
+            margin-bottom: 15px;
+            text-align: justify;
+        }
+
+        .screenshot {
+            margin: 25px 0;
+            page-break-inside: avoid;
+        }
+
+        .screenshot-container {
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 15px;
+            background: #f9fafb;
+            text-align: center;
+        }
+
+        .screenshot img {
+            max-width: 100%;
+            width: 100%;
+            height: auto;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            display: block;
+            margin: 0 auto;
+        }
+
+        .screenshot-caption {
+            margin-top: 12px;
+            font-style: italic;
+            color: #666;
+            font-size: 14px;
+        }
+
+        .steps {
+            background: #f0f9ff;
+            border-left: 4px solid #6366f1;
+            padding: 20px;
+            margin: 20px 0;
+        }
+
+        .steps ol {
+            margin-left: 20px;
+        }
+
+        .steps li {
+            margin: 12px 0;
+            font-size: 15px;
+        }
+
+        .note {
+            background: #fef3c7;
+            border-left: 4px solid #f59e0b;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 4px;
+        }
+
+        .note strong {
+            color: #d97706;
+        }
+
+        .tip {
+            background: #d1fae5;
+            border-left: 4px solid #10b981;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 4px;
+        }
+
+        .tip strong {
+            color: #059669;
+        }
+
+        .warning {
+            background: #fee2e2;
+            border-left: 4px solid #ef4444;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 4px;
+        }
+
+        .warning strong {
+            color: #dc2626;
+        }
+
+        .button-example {
+            display: inline-block;
+            background: #6366f1;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-weight: bold;
+            text-decoration: none;
+            margin: 10px 5px;
+        }
+
+        .icon {
+            font-size: 20px;
+            margin-right: 5px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+
+        table th,
+        table td {
+            border: 1px solid #e5e7eb;
+            padding: 12px;
+            text-align: left;
+        }
+
+        table th {
+            background: #6366f1;
+            color: white;
+            font-weight: bold;
+        }
+
+        table tr:nth-child(even) {
+            background: #f9fafb;
+        }
+
+        .emoji-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .emoji-item {
+            text-align: center;
+            padding: 15px;
+            background: #f9fafb;
+            border-radius: 8px;
+            border: 1px solid #e5e7eb;
+        }
+
+        .emoji-item .emoji {
+            font-size: 40px;
+            margin-bottom: 8px;
+        }
+
+        .emoji-item .name {
+            font-weight: bold;
+            color: #6366f1;
+        }
+
+        .footer {
+            text-align: center;
+            padding: 30px 0;
+            margin-top: 50px;
+            border-top: 2px solid #e5e7eb;
+            color: #666;
+            page-break-before: always;
+        }
+
+        .contact-info {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+
+        @media print {
+            body {
+                padding: 0;
+            }
+
+            .no-print {
+                display: none;
+            }
+
+            .section {
+                page-break-inside: avoid;
+            }
+
+            a {
+                color: #333;
+                text-decoration: none;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- PORTADA -->
+    <div class="header">
+        <h1>🧠 MindCare AI</h1>
+        <p class="subtitle">Manual de Usuario</p>
+        <p class="version">Versión 1.0.0 | Noviembre 2025</p>
+        <p style="margin-top: 30px; color: #666;">
+            Sistema de Análisis Emocional Inteligente<br>
+            Gestión de Emociones y Hábitos
+        </p>
+    </div>
+
+    <!-- BOTÓN DE DESCARGA PDF (Solo visible en pantalla) -->
+    <div class="no-print" style="text-align: center; margin-bottom: 30px;">
+        <button onclick="window.print()" class="button-example">
+            📥 Descargar como PDF
+        </button>
+    </div>
+
+    <!-- ÍNDICE -->
+    <div class="toc">
+        <h2>📑 Índice de Contenidos</h2>
+        <ol>
+            <li><a href="#introduccion">Introducción</a></li>
+            <li><a href="#requisitos">Requisitos del Sistema</a></li>
+            <li><a href="#registro">Registro de Usuario</a></li>
+            <li><a href="#login">Inicio de Sesión</a></li>
+            <li><a href="#analisis">Análisis Emocional</a></li>
+            <li><a href="#historial">Historial de Emociones</a></li>
+            <li><a href="#habitos">Sistema de Hábitos</a>
+                <ol style="margin-left: 20px; margin-top: 5px;">
+                    <li><a href="#crear-habito">Crear Hábitos</a></li>
+                    <li><a href="#vista-habitos">Vista de Hábitos Diarios</a></li>
+                    <li><a href="#estadisticas-habitos">Estadísticas de Hábitos</a></li>
+                    <li><a href="#progreso-habito">Progreso Individual</a></li>
+                    <li><a href="#logros">Sistema de Logros</a></li>
+                </ol>
+            </li>
+            <li><a href="#perfil">Mi Perfil</a></li>
+            <li><a href="#backup">Respaldo de Datos</a></li>
+            <li><a href="#solucion">Solución de Problemas</a></li>
+            <li><a href="#contacto">Contacto y Soporte</a></li>
+        </ol>
+    </div>
+
+    <!-- 1. INTRODUCCIÓN -->
+    <div class="section" id="introduccion">
+        <h2>1. 📖 Introducción</h2>
+        
+        <h3>¿Qué es MindCare AI?</h3>
+        <p>
+            MindCare AI es una aplicación web inteligente diseñada para ayudarte a comprender 
+            y gestionar mejor tus emociones a través de un diario interactivo potenciado por 
+            Inteligencia Artificial. La aplicación analiza tus textos emocionales y te proporciona 
+            retroalimentación personalizada, estadísticas y seguimiento de hábitos.
+        </p>
+
+        <h3>Características Principales</h3>
+        <ul style="margin-left: 30px; margin-top: 15px;">
+            <li style="margin: 10px 0;"><strong>🎭 Análisis Emocional con IA:</strong> Detecta automáticamente emociones en tus textos usando tecnología avanzada.</li>
+            <li style="margin: 10px 0;"><strong>📊 Historial Completo:</strong> Guarda y visualiza todas tus entradas emocionales con filtros y estadísticas.</li>
+            <li style="margin: 10px 0;"><strong>📝 Gestión de Hábitos:</strong> Crea, rastrea y mejora tus hábitos diarios con sistema de rachas.</li>
+            <li style="margin: 10px 0;"><strong>🔐 Seguridad:</strong> Tus datos están protegidos con encriptación y autenticación segura.</li>
+            <li style="margin: 10px 0;"><strong>💾 Respaldo:</strong> Exporta tus datos cuando quieras.</li>
+        </ul>
+
+        <h3>Emociones Reconocidas</h3>
+        <p>El sistema puede detectar y analizar las siguientes 10 emociones:</p>
+        
+        <div class="emoji-list">
+            <div class="emoji-item">
+                <div class="emoji">😊</div>
+                <div class="name">Alegría</div>
+            </div>
+            <div class="emoji-item">
+                <div class="emoji">😢</div>
+                <div class="name">Tristeza</div>
+            </div>
+            <div class="emoji-item">
+                <div class="emoji">😠</div>
+                <div class="name">Enojo</div>
+            </div>
+            <div class="emoji-item">
+                <div class="emoji">😨</div>
+                <div class="name">Miedo</div>
+            </div>
+            <div class="emoji-item">
+                <div class="emoji">😲</div>
+                <div class="name">Sorpresa</div>
+            </div>
+            <div class="emoji-item">
+                <div class="emoji">😖</div>
+                <div class="name">Disgusto</div>
+            </div>
+            <div class="emoji-item">
+                <div class="emoji">😰</div>
+                <div class="name">Ansiedad</div>
+            </div>
+            <div class="emoji-item">
+                <div class="emoji">😓</div>
+                <div class="name">Estrés</div>
+            </div>
+            <div class="emoji-item">
+                <div class="emoji">😌</div>
+                <div class="name">Calma</div>
+            </div>
+            <div class="emoji-item">
+                <div class="emoji">🥺</div>
+                <div class="name">Nostalgia</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 2. REQUISITOS -->
+    <div class="section" id="requisitos">
+        <h2>2. 💻 Requisitos del Sistema</h2>
+        
+        <h3>Navegadores Compatibles</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>Navegador</th>
+                    <th>Versión Mínima</th>
+                    <th>Recomendado</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Google Chrome</td>
+                    <td>90+</td>
+                    <td>✅ Altamente recomendado</td>
+                </tr>
+                <tr>
+                    <td>Mozilla Firefox</td>
+                    <td>88+</td>
+                    <td>✅ Recomendado</td>
+                </tr>
+                <tr>
+                    <td>Microsoft Edge</td>
+                    <td>90+</td>
+                    <td>✅ Recomendado</td>
+                </tr>
+                <tr>
+                    <td>Safari</td>
+                    <td>14+</td>
+                    <td>⚠️ Compatible</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h3>Requisitos Técnicos</h3>
+        <ul style="margin-left: 30px; margin-top: 15px;">
+            <li style="margin: 10px 0;">Conexión a Internet estable</li>
+            <li style="margin: 10px 0;">JavaScript habilitado</li>
+            <li style="margin: 10px 0;">Cookies y almacenamiento local habilitados</li>
+            <li style="margin: 10px 0;">Resolución mínima de pantalla: 1024x768</li>
+        </ul>
+
+        <div class="tip">
+            <strong>💡 Consejo:</strong> Para una mejor experiencia, utiliza Google Chrome o Firefox 
+            en su última versión y asegúrate de tener una conexión estable a Internet.
+        </div>
+    </div>
+
+    <!-- 3. REGISTRO -->
+    <div class="section" id="registro">
+        <h2>3. 📝 Registro de Usuario</h2>
+        
+        <p>
+            Para comenzar a usar MindCare AI, primero necesitas crear una cuenta. 
+            El proceso de registro es simple y rápido.
+        </p>
+
+        <h3>Pasos para Registrarse</h3>
+        <div class="steps">
+            <ol>
+                <li>Abre tu navegador y accede a la aplicación en: <code>http://localhost:3000</code></li>
+                <li>Haz clic en el botón <span class="button-example">Registrarse</span> en la página principal</li>
+                <li>Completa el formulario con los siguientes datos:
+                    <ul style="margin-top: 10px;">
+                        <li><strong>Nombre completo:</strong> Tu nombre (mínimo 2 caracteres)</li>
+                        <li><strong>Email:</strong> Tu dirección de correo electrónico válida</li>
+                        <li><strong>Contraseña:</strong> Una contraseña segura (mínimo 6 caracteres)</li>
+                    </ul>
+                </li>
+                <li>Haz clic en el botón <span class="button-example">Crear Cuenta</span></li>
+                <li>Si todo es correcto, serás redirigido automáticamente a la página de inicio de sesión</li>
+            </ol>
+        </div>
+
+        <div class="screenshot">
+            <div class="screenshot-container">
+                <img src="images/registro.png" alt="Formulario de registro con campos de Nombre completo, Email, Contraseña y Confirmar contraseña" loading="lazy">
+                <p class="screenshot-caption">Figura 1: Formulario de registro de usuario</p>
+            </div>
+        </div>
+
+        <h3>Elementos del Formulario</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>Campo</th>
+                    <th>Descripción</th>
+                    <th>Requisitos</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>Nombre</strong></td>
+                    <td>Tu nombre completo o nombre de usuario</td>
+                    <td>Mínimo 2 caracteres</td>
+                </tr>
+                <tr>
+                    <td><strong>Email</strong></td>
+                    <td>Correo electrónico único</td>
+                    <td>Formato válido de email</td>
+                </tr>
+                <tr>
+                    <td><strong>Contraseña</strong></td>
+                    <td>Contraseña para tu cuenta</td>
+                    <td>Mínimo 6 caracteres</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div class="warning">
+            <strong>⚠️ Importante:</strong> Tu contraseña se almacena de forma encriptada y no puede 
+            ser recuperada. Asegúrate de recordarla o anotarla en un lugar seguro.
+        </div>
+
+        <div class="tip">
+            <strong>💡 Consejo de Seguridad:</strong> Utiliza una contraseña que incluya letras, 
+            números y caracteres especiales para mayor seguridad.
+        </div>
+    </div>
+
+    <!-- 4. INICIO DE SESIÓN -->
+    <div class="section" id="login">
+        <h2>4. 🔐 Inicio de Sesión</h2>
+        
+        <p>
+            Una vez que hayas creado tu cuenta, puedes iniciar sesión en cualquier momento 
+            para acceder a tus datos y funcionalidades.
+        </p>
+
+        <h3>Pasos para Iniciar Sesión</h3>
+        <div class="steps">
+            <ol>
+                <li>Accede a la página principal de MindCare AI</li>
+                <li>Haz clic en el botón <span class="button-example">Iniciar Sesión</span></li>
+                <li>Ingresa tu email y contraseña</li>
+                <li>Haz clic en <span class="button-example">Ingresar</span></li>
+                <li>Si las credenciales son correctas, serás redirigido al panel principal</li>
+            </ol>
+        </div>
+
+        <div class="screenshot">
+            <div class="screenshot-container">
+                <img src="images/login.png" alt="Página de login con campos Email y Contraseña" loading="lazy">
+                <p class="screenshot-caption">Figura 2: Página de inicio de sesión</p>
+            </div>
+        </div>
+
+        <h3>Navegación Principal</h3>
+        <p>
+            Una vez que inicies sesión, verás el menú de navegación en la parte superior con 
+            las siguientes opciones:
+        </p>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Botón</th>
+                    <th>Icono</th>
+                    <th>Función</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>Diario</strong></td>
+                    <td>📝</td>
+                    <td>Página principal para análisis emocional</td>
+                </tr>
+                <tr>
+                    <td><strong>Historial</strong></td>
+                    <td>📊</td>
+                    <td>Ver todas tus entradas emocionales guardadas</td>
+                </tr>
+                <tr>
+                    <td><strong>Hábitos</strong></td>
+                    <td>✅</td>
+                    <td>Gestionar tus hábitos diarios</td>
+                </tr>
+                <tr>
+                    <td><strong>Cerrar Sesión</strong></td>
+                    <td>🚪</td>
+                    <td>Salir de tu cuenta de forma segura</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div class="note">
+            <strong>📌 Nota:</strong> Tu sesión se mantiene activa incluso si cierras el navegador, 
+            gracias al sistema de tokens JWT. Para mayor seguridad, cierra sesión cuando no estés 
+            usando la aplicación.
+        </div>
+    </div>
+
+    <!-- 5. ANÁLISIS EMOCIONAL -->
+    <div class="section" id="analisis">
+        <h2>5. 🎭 Análisis Emocional</h2>
+        
+        <p>
+            Esta es la función principal de MindCare AI. Aquí puedes escribir sobre cómo te sientes 
+            y la inteligencia artificial analizará tus emociones.
+        </p>
+
+        <h3>Realizar un Análisis</h3>
+        <div class="steps">
+            <ol>
+                <li>Ve a la página principal (botón <span class="button-example">📝 Diario</span>)</li>
+                <li>En el área de texto grande, escribe sobre cómo te sientes
+                    <ul style="margin-top: 10px;">
+                        <li>Mínimo 10 caracteres</li>
+                        <li>Sé sincero y descriptivo</li>
+                        <li>Puedes escribir todo lo que quieras</li>
+                    </ul>
+                </li>
+                <li>Haz clic en el botón <span class="button-example">🔮 Analizar Emoción</span></li>
+                <li>Espera unos segundos mientras la IA procesa tu texto</li>
+                <li>Verás los resultados del análisis en pantalla</li>
+            </ol>
+        </div>
+
+        <div class="screenshot">
+            <div class="screenshot-container">
+                <img src="images/analisis-area.png" alt="Área de texto para escribir emociones con el botón Analizar mis emociones" loading="lazy">
+                <p class="screenshot-caption">Figura 3: Área de análisis emocional</p>
+            </div>
+        </div>
+
+        <h3>Interpretando los Resultados</h3>
+        <p>Después del análisis, verás la siguiente información:</p>
+
+        <h4>1. Emoji Animado</h4>
+        <p>
+            Un emoji grande que representa tu emoción principal. El emoji aparece con una 
+            animación suave para captar tu atención.
+        </p>
+
+        <h4>2. Emoción Principal</h4>
+        <p>
+            El nombre de la emoción detectada (Alegría, Tristeza, Enojo, etc.) en texto grande 
+            y claro.
+        </p>
+
+        <h4>3. Nivel de Confianza</h4>
+        <p>
+            Una barra de progreso que muestra qué tan segura está la IA de su análisis:
+        </p>
+        <ul style="margin-left: 30px; margin-top: 15px;">
+            <li style="margin: 8px 0;"><strong>0-40%:</strong> Confianza baja (el texto puede ser ambiguo)</li>
+            <li style="margin: 8px 0;"><strong>41-70%:</strong> Confianza media (análisis moderado)</li>
+            <li style="margin: 8px 0;"><strong>71-100%:</strong> Confianza alta (análisis muy preciso)</li>
+        </ul>
+
+        <h4>4. Desglose de Emociones</h4>
+        <p>
+            Una lista que muestra todas las emociones detectadas en tu texto con sus respectivos 
+            porcentajes. Esto te ayuda a entender la complejidad de tus sentimientos.
+        </p>
+
+        <h4>5. Retroalimentación Personalizada</h4>
+        <p>
+            Un mensaje personalizado basado en tu emoción principal, con consejos y palabras 
+            de apoyo específicas.
+        </p>
+
+        <div class="screenshot">
+            <div class="screenshot-container">
+                <img src="images/resultado-analisis.png" alt="Resultados mostrando emoji de Alegría con 90% de confianza y recomendaciones personalizadas" loading="lazy">
+                <p class="screenshot-caption">Figura 4: Resultados del análisis emocional</p>
+            </div>
+        </div>
+
+        <h3>Botones de Acción</h3>
+        <p>Después de ver los resultados, puedes:</p>
+        <ul style="margin-left: 30px; margin-top: 15px;">
+            <li style="margin: 10px 0;">
+                <span class="button-example">🔄 Realizar Nuevo Análisis</span> - 
+                Limpia la pantalla para hacer otro análisis
+            </li>
+            <li style="margin: 10px 0;">
+                <span class="button-example">📊 Ver Historial</span> - 
+                Te lleva directamente a tu historial de emociones
+            </li>
+        </ul>
+
+        <div class="tip">
+            <strong>💡 Consejos para Mejores Resultados:</strong>
+            <ul style="margin-top: 10px; margin-left: 20px;">
+                <li>Escribe al menos 2-3 oraciones</li>
+                <li>Sé específico sobre lo que sientes</li>
+                <li>Usa palabras descriptivas de emociones</li>
+                <li>No te preocupes por la gramática perfecta</li>
+            </ul>
+        </div>
+
+        <div class="note">
+            <strong>📌 Nota:</strong> Cada análisis se guarda automáticamente en tu historial, 
+            por lo que puedes consultarlo más tarde sin necesidad de guardarlo manualmente.
+        </div>
+    </div>
+
+    <!-- 6. HISTORIAL -->
+    <div class="section" id="historial">
+        <h2>6. 📊 Historial de Emociones</h2>
+        
+        <p>
+            El historial te permite ver todas tus entradas emocionales anteriores, con estadísticas 
+            y la posibilidad de filtrarlas por fecha y emoción.
+        </p>
+
+        <h3>Acceder al Historial</h3>
+        <div class="steps">
+            <ol>
+                <li>Haz clic en el botón <span class="button-example">📊 Historial</span> en el menú superior</li>
+                <li>La página cargará automáticamente todas tus entradas</li>
+            </ol>
+        </div>
+
+        <div class="screenshot">
+            <div class="screenshot-container">
+                <img src="images/historial.png" alt="Tu Historial Emocional mostrando entrada de alegría registrada" loading="lazy">
+                <p class="screenshot-caption">Figura 5: Vista del historial emocional</p>
+            </div>
+        </div>
+
+        <h3>Componentes del Historial</h3>
+
+        <h4>1. Estadísticas Generales</h4>
+        <p>En la parte superior verás tres tarjetas con información clave:</p>
+        <table>
+            <thead>
+                <tr>
+                    <th>Estadística</th>
+                    <th>Descripción</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>📝 Total de Entradas</strong></td>
+                    <td>Número total de análisis emocionales registrados</td>
+                </tr>
+                <tr>
+                    <td><strong>🎭 Emoción más Común</strong></td>
+                    <td>La emoción que más frecuentemente experimentas</td>
+                </tr>
+                <tr>
+                    <td><strong>📊 Confianza Promedio</strong></td>
+                    <td>Nivel promedio de confianza de todos tus análisis</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h4>2. Lista de Entradas</h4>
+        <p>Cada entrada muestra:</p>
+        <ul style="margin-left: 30px; margin-top: 15px;">
+            <li style="margin: 10px 0;"><strong>Fecha y hora:</strong> Cuándo hiciste el análisis</li>
+            <li style="margin: 10px 0;"><strong>Preview del texto:</strong> Primeras palabras de tu entrada</li>
+            <li style="margin: 10px 0;"><strong>Badge de emoción:</strong> Etiqueta de color con la emoción detectada</li>
+            <li style="margin: 10px 0;"><strong>Nivel de confianza:</strong> Porcentaje de precisión del análisis</li>
+        </ul>
+
+        <h4>3. Ver Detalles</h4>
+        <div class="steps">
+            <ol>
+                <li>Haz clic en cualquier entrada de la lista</li>
+                <li>Se abrirá un modal (ventana emergente) con:
+                    <ul style="margin-top: 10px;">
+                        <li>Texto completo de tu entrada</li>
+                        <li>Emoción detectada con emoji</li>
+                        <li>Confianza del análisis</li>
+                        <li>Desglose completo de emociones</li>
+                        <li>Fecha y hora exactas</li>
+                    </ul>
+                </li>
+                <li>Haz clic en ❌ o fuera del modal para cerrarlo</li>
+            </ol>
+        </div>
+
+        <div class="tip">
+            <strong>💡 Consejo:</strong> Revisa regularmente tu historial para identificar patrones 
+            en tus emociones y entender mejor cómo te sientes a lo largo del tiempo.
+        </div>
+
+        <div class="note">
+            <strong>📌 Nota:</strong> El botón <span class="button-example">🔄 Actualizar</span> 
+            recarga la lista de entradas, útil si acabas de hacer un nuevo análisis.
+        </div>
+    </div>
+
+    <!-- 7. HÁBITOS -->
+    <div class="section" id="habitos">
+        <h2>7. ✅ Sistema de Hábitos</h2>
+        
+        <p>
+            El módulo de hábitos te ayuda a crear, rastrear y mejorar tus hábitos diarios relacionados 
+            con tu bienestar emocional.
+        </p>
+
+        <h3>Acceder al Sistema de Hábitos</h3>
+        <div class="steps">
+            <ol>
+                <li>Haz clic en el botón <span class="button-example">✅ Hábitos</span> en el menú superior</li>
+                <li>Llegarás a la página principal de gestión de hábitos</li>
+            </ol>
+        </div>
+
+        <h3 id="crear-habito">Crear un Nuevo Hábito</h3>
+        <div class="steps">
+            <ol>
+                <li>Haz clic en el botón <span class="button-example">➕ Nuevo Hábito</span></li>
+                <li>Completa el formulario con la siguiente información:
+                    <table style="margin-top: 15px;">
+                        <thead>
+                            <tr>
+                                <th>Campo</th>
+                                <th>Descripción</th>
+                                <th>Ejemplo</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Nombre</strong></td>
+                                <td>Título corto del hábito</td>
+                                <td>"Meditar 10 minutos"</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Descripción</strong></td>
+                                <td>Detalles adicionales (opcional)</td>
+                                <td>"Meditación matutina antes del desayuno"</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Categoría</strong></td>
+                                <td>Tipo de hábito</td>
+                                <td>Personal, Salud, Productividad, Social</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Frecuencia</strong></td>
+                                <td>Con qué frecuencia lo harás</td>
+                                <td>Diaria, Semanal, Personalizada</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Icono</strong></td>
+                                <td>Emoji representativo</td>
+                                <td>🧘 🏃 📚 💪</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Color</strong></td>
+                                <td>Color identificativo</td>
+                                <td>Azul, Verde, Rojo, etc.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </li>
+                <li>Haz clic en <span class="button-example">Guardar Hábito</span></li>
+            </ol>
+        </div>
+
+        <div class="screenshot">
+            <div class="screenshot-container">
+                <img src="images/crear-habito.png" alt="Formulario para crear nuevo hábito con campos de nombre, descripción, categoría, frecuencia, icono y color" loading="lazy">
+                <p class="screenshot-caption">Figura 6: Formulario para crear un nuevo hábito</p>
+            </div>
+        </div>
+
+        <h3 id="vista-habitos">Marcar Hábitos Completados</h3>
+        <div class="steps">
+            <ol>
+                <li>En la página de hábitos, verás una lista de tus hábitos para hoy</li>
+                <li>Cada hábito tiene una casilla de verificación (☑️)</li>
+                <li>Haz clic en la casilla cuando completes el hábito</li>
+                <li>El hábito se marcará como completado y se agregará a tu racha</li>
+                <li>Puedes desmarcar si fue un error</li>
+            </ol>
+        </div>
+
+        <h3>Visualizar Progreso</h3>
+        <p>Para cada hábito puedes ver:</p>
+        <ul style="margin-left: 30px; margin-top: 15px;">
+            <li style="margin: 10px 0;"><strong>🔥 Racha Actual:</strong> Días consecutivos que has completado el hábito</li>
+            <li style="margin: 10px 0;"><strong>🏆 Mejor Racha:</strong> Tu récord de días consecutivos</li>
+            <li style="margin: 10px 0;"><strong>📊 Progreso Semanal:</strong> Cuántas veces completaste el hábito esta semana</li>
+            <li style="margin: 10px 0;"><strong>📈 Progreso Mensual:</strong> Cuántas veces lo completaste este mes</li>
+        </ul>
+
+        <div class="screenshot">
+            <div class="screenshot-container">
+                <img src="images/vista-habitos.png" alt="Lista de hábitos del día con checkboxes y estadísticas generales" loading="lazy">
+                <p class="screenshot-caption">Figura 7: Vista de hábitos diarios con opciones para marcar completados</p>
+            </div>
+        </div>
+
+        <h3 id="estadisticas-habitos">Estadísticas de Hábitos</h3>
+        <p>
+            El sistema te muestra un dashboard completo con las métricas más importantes de tu progreso:
+        </p>
+        
+        <div class="screenshot">
+            <div class="screenshot-container">
+                <img src="images/estadisticas-habitos.png" alt="Dashboard con estadísticas: completados hoy, hábitos activos, mejor racha y progreso de hoy" loading="lazy">
+                <p class="screenshot-caption">Figura 8: Estadísticas generales de hábitos - muestra cuántos completaste hoy, total de hábitos activos, tu mejor racha y el porcentaje de progreso diario</p>
+            </div>
+        </div>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Métrica</th>
+                    <th>Descripción</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>✅ Completados hoy</strong></td>
+                    <td>Cantidad de hábitos que has completado hoy</td>
+                </tr>
+                <tr>
+                    <td><strong>🎯 Hábitos activos</strong></td>
+                    <td>Total de hábitos que tienes configurados</td>
+                </tr>
+                <tr>
+                    <td><strong>🔥 Mejor racha</strong></td>
+                    <td>Tu récord de días consecutivos cumpliendo hábitos</td>
+                </tr>
+                <tr>
+                    <td><strong>📈 Progreso de hoy</strong></td>
+                    <td>Porcentaje de hábitos completados del día</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h3 id="progreso-habito">Seguimiento Individual de Hábitos</h3>
+        <p>
+            Cada hábito tiene su propia página de progreso donde puedes ver:
+        </p>
+        
+        <div class="screenshot">
+            <div class="screenshot-container">
+                <img src="images/progreso-habito.png" alt="Vista detallada del progreso de un hábito específico con días completados esta semana, cumplimiento mensual, racha actual y progreso semanal" loading="lazy">
+                <p class="screenshot-caption">Figura 9: Progreso detallado de un hábito individual con calendario semanal y estadísticas</p>
+            </div>
+        </div>
+
+        <ul style="margin-left: 30px; margin-top: 15px;">
+            <li style="margin: 10px 0;"><strong>📅 Días completados esta semana:</strong> Cuántos días de los últimos 7 cumpliste el hábito</li>
+            <li style="margin: 10px 0;"><strong>📊 Cumplimiento mensual:</strong> Porcentaje de días del mes que completaste el hábito</li>
+            <li style="margin: 10px 0;"><strong>🔥 Racha actual:</strong> Días consecutivos cumpliendo el hábito</li>
+            <li style="margin: 10px 0;"><strong>✅ Total completado:</strong> Cuántas veces en total has completado este hábito</li>
+            <li style="margin: 10px 0;"><strong>📈 Progreso semanal:</strong> Visualización gráfica de tu desempeño semanal</li>
+        </ul>
+
+        <h3 id="logros">Sistema de Logros</h3>
+        <p>
+            A medida que completas hábitos y mantienes rachas, desbloqueas logros e insignias especiales:
+        </p>
+        
+        <div class="screenshot">
+            <div class="screenshot-container">
+                <img src="images/logros.png" alt="Panel de logros mostrando insignias desbloqueadas, progreso total y hábitos completados" loading="lazy">
+                <p class="screenshot-caption">Figura 10: Sistema de logros con insignias y progreso general</p>
+            </div>
+        </div>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Tipo de Logro</th>
+                    <th>Cómo Desbloquearlo</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>🌱 Primer Paso</strong></td>
+                    <td>Crea tu primer hábito</td>
+                </tr>
+                <tr>
+                    <td><strong>🔥 Inicio</strong></td>
+                    <td>Mantén una racha de 3 días</td>
+                </tr>
+                <tr>
+                    <td><strong>⭐ Especiales</strong></td>
+                    <td>Completa hábitos marcados como especiales</td>
+                </tr>
+                <tr>
+                    <td><strong>🏆 Completados</strong></td>
+                    <td>Alcanza diferentes niveles de hábitos completados</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h3>Categorías de Hábitos</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>Categoría</th>
+                    <th>Descripción</th>
+                    <th>Ejemplos</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>Personal</strong></td>
+                    <td>Desarrollo personal y autocuidado</td>
+                    <td>Meditar, Journaling, Lectura</td>
+                </tr>
+                <tr>
+                    <td><strong>Salud</strong></td>
+                    <td>Bienestar físico y mental</td>
+                    <td>Ejercicio, Dormir 8h, Tomar agua</td>
+                </tr>
+                <tr>
+                    <td><strong>Productividad</strong></td>
+                    <td>Trabajo y eficiencia</td>
+                    <td>Estudiar, Planificar el día, Deep work</td>
+                </tr>
+                <tr>
+                    <td><strong>Social</strong></td>
+                    <td>Relaciones y conexiones</td>
+                    <td>Llamar familia, Socializar, Ayudar</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h3>Gestionar Hábitos Existentes</h3>
+        <p>Para cada hábito puedes:</p>
+        <ul style="margin-left: 30px; margin-top: 15px;">
+            <li style="margin: 10px 0;"><strong>✏️ Editar:</strong> Modificar nombre, descripción, categoría, etc.</li>
+            <li style="margin: 10px 0;"><strong>⏸️ Pausar:</strong> Desactivar temporalmente sin perder el progreso</li>
+            <li style="margin: 10px 0;"><strong>▶️ Activar:</strong> Reactivar un hábito pausado</li>
+            <li style="margin: 10px 0;"><strong>🗑️ Eliminar:</strong> Borrar permanentemente el hábito</li>
+        </ul>
+
+        <div class="tip">
+            <strong>💡 Consejos para el Éxito:</strong>
+            <ul style="margin-top: 10px; margin-left: 20px;">
+                <li>Empieza con 2-3 hábitos simples</li>
+                <li>Sé realista con la frecuencia</li>
+                <li>Vincula nuevos hábitos con rutinas existentes</li>
+                <li>Celebra tus rachas, por pequeñas que sean</li>
+                <li>No te desanimes si rompes una racha, ¡empieza de nuevo!</li>
+            </ul>
+        </div>
+
+        <div class="note">
+            <strong>📌 Nota:</strong> Los hábitos están diseñados para complementar tu análisis emocional. 
+            Hábitos saludables pueden mejorar significativamente tu estado emocional.
+        </div>
+    </div>
+
+    <!-- 8. PERFIL DE USUARIO -->
+    <div class="section" id="perfil">
+        <h2>8. 👤 Mi Perfil</h2>
+        
+        <p>
+            Tu perfil es el centro de control de tu cuenta donde puedes ver tu información personal 
+            y tus estadísticas generales.
+        </p>
+
+        <h3>Acceder al Perfil</h3>
+        <div class="steps">
+            <ol>
+                <li>Haz clic en el botón <span class="button-example">👤 Mi Perfil</span> en el menú principal</li>
+                <li>Se abrirá una ventana modal con toda tu información</li>
+            </ol>
+        </div>
+
+        <div class="screenshot">
+            <div class="screenshot-container">
+                <img src="images/perfil.png" alt="Panel de perfil mostrando nombre de usuario, email, hábitos creados, completados, racha actual y fecha de registro" loading="lazy">
+                <p class="screenshot-caption">Figura 11: Vista del perfil de usuario con estadísticas personales</p>
+            </div>
+        </div>
+
+        <h3>Información del Perfil</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>Sección</th>
+                    <th>Contenido</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>Información Personal</strong></td>
+                    <td>Nombre completo y correo electrónico</td>
+                </tr>
+                <tr>
+                    <td><strong>🎯 Hábitos Creados</strong></td>
+                    <td>Total de hábitos que has configurado</td>
+                </tr>
+                <tr>
+                    <td><strong>✅ Completados</strong></td>
+                    <td>Cantidad total de hábitos completados</td>
+                </tr>
+                <tr>
+                    <td><strong>🔥 Racha Actual</strong></td>
+                    <td>Días consecutivos manteniendo tus hábitos</td>
+                </tr>
+                <tr>
+                    <td><strong>📅 Miembro desde</strong></td>
+                    <td>Fecha en que creaste tu cuenta</td>
+                </tr>
+                <tr>
+                    <td><strong>🏆 Insignias Desbloqueadas</strong></td>
+                    <td>Total de logros conseguidos</td>
+                </tr>
+                <tr>
+                    <td><strong>⭐ Mejor Racha</strong></td>
+                    <td>Tu récord de días consecutivos</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h3>Opciones del Perfil</h3>
+        <p>Desde tu perfil puedes:</p>
+        <ul style="margin-left: 30px; margin-top: 15px;">
+            <li style="margin: 10px 0;"><strong>Ver estadísticas:</strong> Revisa tu progreso global</li>
+            <li style="margin: 10px 0;"><strong>Acceder al manual:</strong> Botón directo para consultar esta guía</li>
+            <li style="margin: 10px 0;"><strong>Crear respaldos:</strong> Exporta tus datos</li>
+            <li style="margin: 10px 0;"><strong>Cerrar sesión:</strong> Salir de tu cuenta de forma segura</li>
+        </ul>
+
+        <div class="tip">
+            <strong>💡 Consejo:</strong> Revisa tu perfil regularmente para monitorear tu progreso 
+            y mantenerte motivado con tus logros.
+        </div>
+    </div>
+
+    <!-- 9. RESPALDO -->
+    <div class="section" id="backup">
+        <h2>9. 💾 Respaldo de Datos</h2>
+        
+        <p>
+            MindCare AI te permite exportar todos tus datos para tener una copia de seguridad 
+            o para transferirlos a otro dispositivo.
+        </p>
+
+        <h3>Crear un Respaldo</h3>
+        <div class="steps">
+            <ol>
+                <li>En el menú superior, busca la opción de respaldo o configuración</li>
+                <li>Haz clic en <span class="button-example">💾 Crear Respaldo</span></li>
+                <li>El sistema generará un archivo con todos tus datos:
+                    <ul style="margin-top: 10px;">
+                        <li>Todas tus entradas emocionales</li>
+                        <li>Todos tus hábitos</li>
+                        <li>Todas las configuraciones</li>
+                    </ul>
+                </li>
+                <li>Se descargará automáticamente un archivo JSON</li>
+                <li>Guarda este archivo en un lugar seguro</li>
+            </ol>
+        </div>
+
+        <h3>¿Qué Incluye el Respaldo?</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>Tipo de Dato</th>
+                    <th>Incluido</th>
+                    <th>Detalles</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>Análisis Emocionales</strong></td>
+                    <td>✅ Sí</td>
+                    <td>Texto completo, emociones, fechas</td>
+                </tr>
+                <tr>
+                    <td><strong>Hábitos</strong></td>
+                    <td>✅ Sí</td>
+                    <td>Configuración y progreso</td>
+                </tr>
+                <tr>
+                    <td><strong>Estadísticas</strong></td>
+                    <td>✅ Sí</td>
+                    <td>Rachas y contadores</td>
+                </tr>
+                <tr>
+                    <td><strong>Contraseña</strong></td>
+                    <td>❌ No</td>
+                    <td>Por seguridad, nunca se exporta</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div class="warning">
+            <strong>⚠️ Importante:</strong> El archivo de respaldo contiene información sensible. 
+            Guárdalo en un lugar seguro y no lo compartas con nadie.
+        </div>
+
+        <div class="tip">
+            <strong>💡 Recomendación:</strong> Crea respaldos periódicos (una vez al mes) para 
+            no perder tu progreso en caso de problemas técnicos.
+        </div>
+    </div>
+
+    <!-- 10. SOLUCIÓN DE PROBLEMAS -->
+    <div class="section" id="solucion">
+        <h2>10. 🔧 Solución de Problemas</h2>
+        
+        <h3>Problemas Comunes y Soluciones</h3>
+
+        <h4>No puedo iniciar sesión</h4>
+        <div class="steps">
+            <ol>
+                <li>Verifica que tu email y contraseña sean correctos</li>
+                <li>Asegúrate de que no haya espacios adicionales</li>
+                <li>Comprueba que CAPS LOCK no esté activado</li>
+                <li>Si olvidaste tu contraseña, contacta al administrador</li>
+            </ol>
+        </div>
+
+        <h4>El análisis emocional no funciona</h4>
+        <div class="steps">
+            <ol>
+                <li>Verifica tu conexión a Internet</li>
+                <li>Asegúrate de escribir al menos 10 caracteres</li>
+                <li>Recarga la página (F5) y vuelve a intentar</li>
+                <li>Si el problema persiste, el sistema usará análisis por palabras clave</li>
+            </ol>
+        </div>
+
+        <h4>No veo mis entradas en el historial</h4>
+        <div class="steps">
+            <ol>
+                <li>Haz clic en el botón <span class="button-example">🔄 Actualizar</span></li>
+                <li>Verifica que estés usando la cuenta correcta</li>
+                <li>Comprueba los filtros (puede que estén ocultando tus entradas)</li>
+                <li>Selecciona "Todo" en el filtro de período</li>
+            </ol>
+        </div>
+
+        <h4>Los hábitos no se guardan</h4>
+        <div class="steps">
+            <ol>
+                <li>Verifica que todos los campos requeridos estén llenos</li>
+                <li>Asegúrate de hacer clic en "Guardar"</li>
+                <li>Comprueba tu conexión a Internet</li>
+                <li>Recarga la página y vuelve a intentar</li>
+            </ol>
+        </div>
+
+        <h4>La página se ve mal o desordenada</h4>
+        <div class="steps">
+            <ol>
+                <li>Limpia la caché de tu navegador:
+                    <ul style="margin-top: 10px;">
+                        <li>Chrome/Edge: Ctrl + Shift + Delete</li>
+                        <li>Firefox: Ctrl + Shift + Delete</li>
+                    </ul>
+                </li>
+                <li>Actualiza la página con Ctrl + F5</li>
+                <li>Intenta con otro navegador</li>
+                <li>Verifica que JavaScript esté habilitado</li>
+            </ol>
+        </div>
+
+        <h4>Cerré sesión sin querer</h4>
+        <div class="steps">
+            <ol>
+                <li>No te preocupes, tus datos están seguros</li>
+                <li>Simplemente vuelve a iniciar sesión</li>
+                <li>Todos tus datos seguirán ahí</li>
+            </ol>
+        </div>
+
+        <div class="warning">
+            <strong>⚠️ Problemas Persistentes:</strong> Si ninguna solución funciona, contacta 
+            al soporte técnico proporcionando detalles del problema:
+            <ul style="margin-top: 10px; margin-left: 20px;">
+                <li>Navegador y versión</li>
+                <li>Qué estabas haciendo cuando ocurrió el error</li>
+                <li>Mensaje de error (si aparece alguno)</li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- 10. CONTACTO -->
+    <div class="section" id="contacto">
+        <h2>10. 📞 Contacto y Soporte</h2>
+        
+        <p>
+            Si necesitas ayuda adicional o tienes sugerencias para mejorar MindCare AI, 
+            estamos aquí para ayudarte.
+        </p>
+
+        <div class="contact-info">
+            <h3 style="color: #6366f1; margin-bottom: 15px;">Información de Contacto</h3>
+            
+            <p style="margin: 10px 0;">
+                <strong>📧 Email de Soporte:</strong> soporte@mindcareai.com<br>
+                <em>(Respuesta en 24-48 horas)</em>
+            </p>
+
+            <p style="margin: 10px 0;">
+                <strong>🌐 Sitio Web:</strong> www.mindcareai.com
+            </p>
+
+            <p style="margin: 10px 0;">
+                <strong>💬 Reportar un Error:</strong> bugs@mindcareai.com
+            </p>
+
+            <p style="margin: 10px 0;">
+                <strong>💡 Sugerencias:</strong> feedback@mindcareai.com
+            </p>
+        </div>
+
+        <h3>Recursos Adicionales</h3>
+        <ul style="margin-left: 30px; margin-top: 15px;">
+            <li style="margin: 10px 0;">
+                <strong>FAQ (Preguntas Frecuentes):</strong> 
+                Visita nuestra página de preguntas frecuentes para respuestas rápidas
+            </li>
+            <li style="margin: 10px 0;">
+                <strong>Video Tutoriales:</strong> 
+                Encuentra tutoriales en video en nuestro canal de YouTube
+            </li>
+            <li style="margin: 10px 0;">
+                <strong>Blog:</strong> 
+                Lee artículos sobre salud mental y uso de la aplicación
+            </li>
+            <li style="margin: 10px 0;">
+                <strong>Comunidad:</strong> 
+                Únete a nuestra comunidad de usuarios para compartir experiencias
+            </li>
+        </ul>
+
+        <div class="tip">
+            <strong>💡 Antes de Contactarnos:</strong>
+            <ul style="margin-top: 10px; margin-left: 20px;">
+                <li>Consulta la sección de Solución de Problemas</li>
+                <li>Revisa las FAQ en nuestro sitio web</li>
+                <li>Intenta limpiar caché y recargar la página</li>
+            </ul>
+        </div>
+
+        <h3>Horario de Atención</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>Día</th>
+                    <th>Horario</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>Lunes a Viernes</strong></td>
+                    <td>9:00 AM - 6:00 PM</td>
+                </tr>
+                <tr>
+                    <td><strong>Sábados</strong></td>
+                    <td>10:00 AM - 2:00 PM</td>
+                </tr>
+                <tr>
+                    <td><strong>Domingos y Festivos</strong></td>
+                    <td>Cerrado (email disponible)</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- FOOTER -->
+    <div class="footer">
+        <h3 style="color: #6366f1; margin-bottom: 20px;">Gracias por usar MindCare AI</h3>
+        <p>
+            Tu bienestar emocional es importante. Esta herramienta está diseñada para 
+            complementar, no reemplazar, la atención profesional de salud mental.
+        </p>
+        <p style="margin-top: 20px; font-size: 14px;">
+            <strong>Versión del Manual:</strong> 1.0.0<br>
+            <strong>Última Actualización:</strong> Noviembre 2025<br>
+            <strong>© 2025 MindCare AI.</strong> Todos los derechos reservados.
+        </p>
+
+        <div class="warning" style="margin-top: 30px;">
+            <strong>⚠️ Aviso Importante:</strong> Si experimentas una crisis emocional o 
+            pensamientos de autolesión, busca ayuda profesional inmediata. En emergencias, 
+            contacta servicios de emergencia locales o líneas de ayuda en crisis.
+        </div>
+    </div>
+</body>
+</html>

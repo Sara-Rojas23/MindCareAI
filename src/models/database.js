@@ -40,10 +40,7 @@ class Database {
                     name TEXT NOT NULL,
                     email TEXT UNIQUE NOT NULL,
                     password TEXT NOT NULL,
-                    failed_attempts INTEGER DEFAULT 0,
-                    locked_until DATETIME DEFAULT NULL,
-                    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-                    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+                    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
                 )
             `;
 
@@ -55,8 +52,6 @@ class Database {
                     text TEXT NOT NULL,
                     primary_emotion TEXT NOT NULL,
                     confidence INTEGER NOT NULL,
-                    emotion_breakdown TEXT NOT NULL,
-                    context TEXT,
                     analysis_method TEXT DEFAULT 'openai',
                     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
                     FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE
@@ -147,67 +142,8 @@ class Database {
     }
 
     async migrateUsersTable() {
-        return new Promise((resolve, reject) => {
-            // Verificar si las columnas ya existen
-            this.db.all("PRAGMA table_info(users)", (err, columns) => {
-                if (err) {
-                    console.error('Error verificando estructura de users:', err.message);
-                    reject(err);
-                    return;
-                }
-
-                const hasFailedAttempts = columns.some(col => col.name === 'failed_attempts');
-                const hasLockedUntil = columns.some(col => col.name === 'locked_until');
-
-                const migrations = [];
-
-                if (!hasFailedAttempts) {
-                    migrations.push(
-                        new Promise((res, rej) => {
-                            this.db.run(
-                                'ALTER TABLE users ADD COLUMN failed_attempts INTEGER DEFAULT 0',
-                                (err) => {
-                                    if (err) {
-                                        console.error('Error agregando failed_attempts:', err.message);
-                                        rej(err);
-                                    } else {
-                                        console.log('✅ Columna failed_attempts agregada');
-                                        res();
-                                    }
-                                }
-                            );
-                        })
-                    );
-                }
-
-                if (!hasLockedUntil) {
-                    migrations.push(
-                        new Promise((res, rej) => {
-                            this.db.run(
-                                'ALTER TABLE users ADD COLUMN locked_until DATETIME DEFAULT NULL',
-                                (err) => {
-                                    if (err) {
-                                        console.error('Error agregando locked_until:', err.message);
-                                        rej(err);
-                                    } else {
-                                        console.log('✅ Columna locked_until agregada');
-                                        res();
-                                    }
-                                }
-                            );
-                        })
-                    );
-                }
-
-                if (migrations.length > 0) {
-                    Promise.all(migrations)
-                        .then(() => resolve())
-                        .catch(reject);
-                } else {
-                    resolve();
-                }
-            });
-        });
+        // No se requieren migraciones para la tabla users
+        return Promise.resolve();
     }
 
     async migrateHabitsTable() {
